@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "11045694698",
+    "project_id": "pushnotification-9bf6a",
+    "storage_bucket": "pushnotification-9bf6a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:11045694698:android:9f10941aea396b2e65fb93",
+        "android_client_info": {
+          "package_name": "com.techlearn"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA_SKfFw2uuoE_9gSbcWIM7i_d8ix9sHc4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
