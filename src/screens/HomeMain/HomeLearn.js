@@ -21,17 +21,17 @@ const HomeLearn = () => {
       description: 'Ctrlshiftgeek emerged as winners of smart india hackathon 2023',
     },
     {
-      image: car2,
+      image: car1,
       title: 'Fintech',
       description: 'Selected of Fintech, top 20 teams in india',
     },
     {
-      image: car3,
+      image: car1,
       title: 'Scale 91',
       description: 'Selected of scale 91, top 10 teams in india',
     },
     {
-      image: car4,
+      image: car1,
       title: 'Pentathon',
       description: 'Participated in pentathon with award recognition',
     },
@@ -40,10 +40,10 @@ const HomeLearn = () => {
     return (
       <View style={{paddingLeft:20,paddingTop:10}}>
         <Text style={[{fontSize:18,color:'black',fontWeight:'600',letterSpacing:0.2},styles.font]}>
-          Welcome to <Text style={styles.blueText}>Rag Chatbot</Text>
+          Welcome to <Text style={styles.blueText}>Anugrah </Text>
         </Text>
         <Text style={[{fontSize:18,color:'black',fontWeight:'600',letterSpacing:0.2},styles.font]}>
-          <Text style={styles.blueText}>CtrlShiftGeek</Text> is our team
+          <Text style={styles.blueText}>Cyklones</Text> is our team
         </Text>
       </View>
     );

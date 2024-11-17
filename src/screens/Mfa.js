@@ -25,22 +25,23 @@ const Mfa = () => {
   const handleLogin = async () => {
     setLoading(true);
     try {
-      const userName = await AsyncStorage.getItem('username');
-      const data = {
-        username: userName,
-        mfa_code: otp.join(''),
-      };
-      console.log(data);
-      const response = await verifyOtp(data);
+      navigation.navigate('Home')
+    //   const userName = await AsyncStorage.getItem('username');
+    //   const data = {
+    //     username: userName,
+    //     mfa_code: otp.join(''),
+    //   };
+    //   console.log(data);
+    //   const response = await verifyOtp(data);
       
-      if (response?.message === "MFA verification successful") {
-        setErrorMessage(''); // Clear any previous error
-        navigation.navigate('Home');
-      } else if (response?.message === "Incorrect MFA code") {
-        setErrorMessage('Incorrect MFA code. Please try again.'); // Show error message
-      }
-    } catch (error) {
-      Alert.alert("An error occurred during verification");
+    //   if (response?.message === "MFA verification successful") {
+    //     setErrorMessage(''); // Clear any previous error
+    //     navigation.navigate('Home');
+    //   } else if (response?.message === "Incorrect MFA code") {
+    //     setErrorMessage('Incorrect MFA code. Please try again.'); // Show error message
+    //   }
+    // } catch (error) {
+    //   Alert.alert("An error occurred during verification");
     }finally{
         setLoading(false);
     }

@@ -33,7 +33,14 @@ const LearnMain = () => {
             </PersonalizedButton>
           ),
           headerShown: true,
-          headerTitle: '',
+          headerTitle: 'AnugraH',
+          headerTitleStyle: [{
+            fontSize: 20, // Adjust font size
+            fontWeight: '600', // Make text bold
+            color: '#0D69D7', // Set text color
+            letterSpacing: 3, // Adjust spacing between letters
+      
+          },styles.font],
           headerTitleAlign: 'center',
         }}
       />
@@ -96,6 +103,9 @@ const LearnMain = () => {
 };
 
 const styles = StyleSheet.create({
+  font:{
+    fontFamily: 'Helvetica Neue',
+  },
   prof: {
     width: 40,
     height: 40,
@@ -113,6 +123,7 @@ const styles = StyleSheet.create({
     marginLeft: 5, 
     marginRight:10,
   },
+
 });
 
 export default LearnMain;

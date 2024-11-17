@@ -33,7 +33,7 @@ export default function SecondaryButton({
 
 const styles = StyleSheet.create({
   button: {
-    width:'45%',
+    width:'30%',
     flex:1,
     justifyContent:'center',
     paddingVertical: 12,

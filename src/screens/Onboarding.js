@@ -21,14 +21,18 @@ import { useNavigation } from '@react-navigation/native';
 import neo from '../assets/images/neo.png';
 import { loginUser } from '../api/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import PhoneInput from 'react-native-phone-number-input';
+import torn from '../assets/images/torn.png';
+import skcet from '../assets/images/skcet.png';
 
 export function Login() {
   const [userName, setUserName] = useState('');
   const [password, setPassword] = useState('');
   const [userNameError, setUserNameError] = useState('');
-  const [passwordError, setPasswordError] = useState('');
   const [loading, setLoading] = useState(false);
   const [loginError, setLoginError] = useState(''); // New state for login error
+  const [phone, setphone] = useState(false);
+  const [phoneError, setPhoneError] = useState('');
   const navigation = useNavigation();
 
   const validateFields = () => {
@@ -40,13 +44,14 @@ export function Login() {
     } else {
       setUserNameError('');
     }
-
-    if (password.trim() === '') {
-      setPasswordError('Password is required');
+    
+    if (phone.trim === '' || phone.length !== 10 || !/^\d{10}$/.test(phone)) {
+      setPhoneError('Valid 10-digit phone number is required');
       isValid = false;
     } else {
-      setPasswordError('');
+      setPhoneError('');
     }
+    
 
     return isValid;
   };
@@ -55,29 +60,9 @@ export function Login() {
     if (validateFields()) {
       setLoading(true);
       setLoginError(''); // Reset login error on new login attempt
-      try {
-        const data = {
-          username: userName.trim(),
-          password: password.trim(),
-        };
-        const response = await loginUser(data);
-        if (response?.message === "Login successful" && response?.mfa_enabled === false) {
-          await AsyncStorage.setItem('username', userName.trim());
-          await AsyncStorage.setItem('loggedin', 'true');
-          console.log("User login successful without MFA");
-          navigation.navigate('Home');
-        } else if (response?.message === "Login successful" && response?.mfa_enabled === true) {
-          await AsyncStorage.setItem('username', userName.trim());
-          await AsyncStorage.setItem('loggedin', 'true');
-          navigation.navigate('Mfa');
-        } else if (response?.message === "Invalid username or password") {
-          setLoginError(response?.message); // Set login error
-        }
-      } catch (error) {
-        Alert.alert("Some error occurred");
-      } finally {
-        setLoading(false);
-      }
+      navigation.navigate('Mfa');
+    }
+    else{
     }
   };
 
@@ -90,49 +75,62 @@ export function Login() {
             <Text className="text-[24px] font-[Poppins-SemiBold] font-semibold mt-4 text-[#000000]">
               Welcome back!
             </Text>
-            <Text className="text-[16px] font-[Lato] mt-2 text-[#000000]">
+            <Text className="text-[12px] font-[Lato] mt-2 text-[#000000]">
               Sign in to your account
             </Text>
           </View>
           <LottieView source={wel} autoPlay loop style={{ width: 150, height: 150 }} />
         </View>
+            <Text style={{letterSpacing:2}} className="text-[28px] mt-[-55px] py-3 font-[700] font-[Helvetica Neue] text-[#0D69D7]">
+              Anugrah
+            </Text>
         {
           loading ? (
+            <>
             <View>
               <LottieView source={require('../assets/lottie/loading.json')} autoPlay loop style={{ height: 250, width: 360, alignSelf: 'center' }} />
               <Text style={[{ fontSize: 12, color: 'black', fontWeight: '400', letterSpacing: 0.2, alignSelf: 'center', marginTop: -110 }, styles.font]}>Loading...</Text>
             </View>
+            {/* <View> */}
+            {/* </View> */}
+            </>
           ) : (
-            <View>
+            <View style={{marginTop:-12}}>
               <>
                 <Input
                   value={userName}
                   label="Username"
                   labelStyle={styles.label}
-                  placeholder="e.g. person@gmail.com"
+                  placeholder="e.g. name@123"
                   containerStyle={styles.inputmargin}
                   setValue={(val: String) => setUserName(val)}
                 />
                 {userNameError ? <Text style={styles.errorText}>{userNameError}</Text> : null}
-                <Input
-                  value={password}
-                  label="Password"
-                  labelStyle={styles.label}
-                  placeholder="Enter your password"
-                  containerStyle={[styles.inputmargin,{marginTop:12}]}
-                  setValue={(val: String) => setPassword(val)}
-                  password={true}
-                />
-                {passwordError ? <Text style={[styles.errorText,{marginTop:3}]}>{passwordError}</Text> : null}
+                <Text style={styles.label}>Phone</Text>
+                <PhoneInput
+                defaultValue={phone}
+                defaultCode="IN"
+                layout="second"
+                placeholder="Enter your phone number"
+                onChangeText={text => {
+                  setphone(text);
+                }}
+                containerStyle={[
+                  styles.phoneInput,
+                ]}
+                textContainerStyle={styles.phoneTextContainer}
+                codeTextStyle={styles.phoneCode}
+                textInputStyle={styles.phoneText}
+                textInputProps={{
+                  placeholderTextColor: '#6D747A',
+                  maxLength: 10, // Restrict input to 10 digits
+                }}
+              />
+              {phoneError ? <Text style={styles.errorText}>{phoneError}</Text> : null}
                 {loginError ? <Text style={styles.errorText}>{loginError}</Text> : null} 
-                <TouchableOpacity className="flex justify-end flex-row mb-4">
-                  <Text className="text-[#0D69D7] text-[14px] font-normal mt-2 font-[Lato-Bold]">
-                    Forgot Password?
-                  </Text>
-                </TouchableOpacity>
               </>
               <TouchableOpacity
-                className="bg-black flex items-center mb-4 justify-center border rounded-md"
+                className="bg-black flex items-center mt-8 mb-4 justify-center border rounded-md"
                 onPress={handleLogin}
               >
                 <Text className="text-white h-[48px] text-[16px] py-3 font-medium font-[Poppins]">
@@ -140,8 +138,8 @@ export function Login() {
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity className="bg-white flex items-center text-center mb-4 justify-center border rounded-md">
-                <Text className="h-[48px] text-[16px] py-3 font-[800] font-[Helvetica Neue] text-[#0D69D7]">
-                  Docs Chat
+                <Text style={{letterSpacing:1.5}} className="h-[48px] text-[16px] py-3 font-[500] font-[Helvetica Neue] text-[#0D69D7]">
+                  Redefine Possible
                 </Text>
               </TouchableOpacity>
               <View style={styles.signinTextContainer}>
@@ -160,15 +158,15 @@ export function Login() {
 
               <View style={styles.twoColumn}>
                 <SecondaryButton containerStyle={styles.socialButton}>
-                  <Google />
-                  <Text className="text-[#08090A] font-[Lato] font-[400] text-[16px]">
-                    CtrlShiftGeek
+                <Image tintColor={'#0D69D7'} source={torn} style={{ width: 18, height: 18 }} />
+                <Text className="text-[#08090A] font-[Lato] font-[400] text-[16px] ml-[2px]">
+                    Cyklones
                   </Text>
                 </SecondaryButton>
                 <SecondaryButton containerStyle={styles.socialButton}>
-                  <Image source={neo} style={{ width: 70, height: 23.5 }} />
-                  <Text className="text-[#08090A] font-[Lato] font-[400] text-[16px]">
-                    iamneo
+                  <Image source={skcet} style={{ width: 22, height: 22 }} />
+                  <Text className="text-[#08090A] font-[Lato] font-[400] text-[16px] ml-[2px]">
+                    SKCET
                   </Text>
                 </SecondaryButton>
               </View>
@@ -183,7 +181,8 @@ const styles = StyleSheet.create({
   errorText: {
     color: 'red',
     fontSize: 12,
-    marginBottom: 10,
+    // marginBottom: 10,
+    marginTop:2,
   },
   container: {
     backgroundColor: '#fff',
@@ -253,5 +252,46 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 12,
     borderRadius: 4,
+  },
+  phoneInput: {
+    backgroundColor: '#fff',
+    width: '100%',
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: '#CED4DA',
+    // marginTop:12,
+    // marginBottom:12,
+    justifyContent:'center',
+    alignItems:'center',
+    // paddingLeft: 10,
+    height:55
+  },
+  paddingvertical: {
+    // paddingVertical: 2,
+  },
+  phoneTextContainer: {
+    backgroundColor: '#fff',
+    paddingLeft: 0,
+  },
+  phoneCode: {
+    fontWeight: '400',
+    fontSize: 14,
+  },
+  phoneText: {
+    fontWeight: '400',
+    paddingLeft: 16,
+    fontSize: 14,
+    paddingVertical:5,
+    borderLeftWidth: 1,
+    borderColor: '#08090A',
+  },
+  label: {
+    fontFamily: 'Lato-Bold',
+    fontWeight: '600',
+    fontSize: 14,
+    lineHeight: 24,
+    marginBottom: 8,
+    color:'black',
+    marginTop:8,
   },
 });

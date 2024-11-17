@@ -11,7 +11,8 @@ import { Register } from '../screens/Register';
 import Qr from '../screens/Qr.js';
 import Mfa from '../screens/Mfa.js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+// import Contacts from '../screens/Contacts/Contacts.js';
+import ContactMain from '../screens/Contacts/ContactMain.js';
 const Stack = createNativeStackNavigator();
 
 const Router = () => {
@@ -55,7 +56,8 @@ const Router = () => {
     }
 
     return (
-        <Stack.Navigator initialRouteName={'Onboarding'} screenOptions={{ headerShown: false }}>
+        <Stack.Navigator initialRouteName={'Home'} screenOptions={{ headerShown: false }}>
+            <Stack.Screen name='ContactMain' component={ContactMain} options={{ headerShown: false }} />
             <Stack.Screen name='Onboarding' component={Onboarding} options={{ headerShown: false }} />
             <Stack.Screen name='LoginScreen' component={Login} options={{ headerShown: false }} />
             <Stack.Screen name='Register' component={Register} options={{ headerShown: false }} />

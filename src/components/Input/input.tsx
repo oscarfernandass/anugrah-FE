@@ -110,7 +110,8 @@ const styles = StyleSheet.create({
     fontWeight: '400',
     lineHeight: null,
     paddingHorizontal: 16,
-    paddingVertical: 13,
+    // paddingVertical: 13,
+    height:55,
     width: '87%',
   },
 });

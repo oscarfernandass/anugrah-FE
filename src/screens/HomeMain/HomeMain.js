@@ -33,6 +33,7 @@ import kno from '../../assets/images/kno.png';
 import kis from '../../assets/images/kis.png';
 import magnus from '../../assets/images/magnus.png';
 import Magnus from '../Magnus/Magnus.js';
+import ContactMain from '../Contacts/ContactMain.js';
 const HomeMain = () => {
   const navigation = useNavigation();
   const { account } = useAccountContext() ;
@@ -88,6 +89,15 @@ const HomeMain = () => {
           ),
           headerTitle: '',
           headerShown: true,
+          headerTitle: 'AnugraH',
+          headerTitleStyle: [{
+            fontSize: 20, // Adjust font size
+            fontWeight: '600', // Make text bold
+            color: '#0D69D7', // Set text color
+            letterSpacing: 3, // Adjust spacing between letters
+      
+          },styles.font],
+          headerTitleAlign: 'center',
           tabBarIcon: ({ focused, color, size }) => (
             <View style={[
               styles.iconContainer, 
@@ -113,7 +123,7 @@ const HomeMain = () => {
 
 <Tab.Screen
         name="Magnus"
-        component={Magnus}
+        component={ContactMain}
         options={{
           headerLeft: () => (
             <Profile />
@@ -128,7 +138,7 @@ const HomeMain = () => {
             </TouchableOpacity>
           ),
           headerTitle: '',
-          headerShown: true,
+          headerShown: false,
           tabBarIcon: ({ focused, color, size }) => (
             <View style={[
               styles.iconContainer, 
@@ -162,9 +172,9 @@ const HomeMain = () => {
           ),
           headerRight: () => (
             <View style={styles.headerRight}>
-              <TouchableOpacity style={{ marginRight: 0 }}>
+              {/* <TouchableOpacity style={{ marginRight: 0 }}>
                 <Mail />
-              </TouchableOpacity>
+              </TouchableOpacity> */}
               <TouchableOpacity style={{ marginRight: 0 }} 
               onPress={()=>{
                 navigation.navigate('Notification');
@@ -176,6 +186,15 @@ const HomeMain = () => {
           ),
           headerTitle: '',
           headerShown: true,
+          headerTitle: 'AnugraH',
+          headerTitleStyle: [{
+            fontSize: 20, // Adjust font size
+            fontWeight: '600', // Make text bold
+            color: '#0D69D7', // Set text color
+            letterSpacing: 3, // Adjust spacing between letters
+      
+          },styles.font],
+          headerTitleAlign: 'center',
           tabBarIcon: ({ focused, color, size }) => (
             <View style={[
               styles.iconContainer, 
@@ -207,9 +226,9 @@ const HomeMain = () => {
           ),
           headerRight: () => (
             <View style={styles.headerRight}>
-              <TouchableOpacity style={{ marginRight: 0 }}>
+              {/* <TouchableOpacity style={{ marginRight: 0 }}>
                 <Mail />
-              </TouchableOpacity>
+              </TouchableOpacity> */}
               <TouchableOpacity style={{ marginRight: 0 }} 
               onPress={()=>{
                 navigation.navigate('Notification');
@@ -221,6 +240,15 @@ const HomeMain = () => {
           ),
           headerTitle: '',
           headerShown: true,
+          headerTitle: 'AnugraH',
+          headerTitleStyle: [{
+            fontSize: 20, // Adjust font size
+            fontWeight: '500', // Make text bold
+            color: '#0D69D7', // Set text color
+            letterSpacing: 3, // Adjust spacing between letters
+      
+          },styles.font],
+          headerTitleAlign: 'center',
           tabBarIcon: ({ focused, color, size }) => (
             <View style={[
               styles.iconContainer, 
