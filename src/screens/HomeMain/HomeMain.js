@@ -4,7 +4,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useNavigation } from '@react-navigation/native';
 import HomeLearn from './HomeLearn';
 import Preparation from '../Preparation/Preparation.js';
-import Jobs from '../Jobs/Jobs.js';
+import Jobs from '../InPerson/InPerson.js';
 import learn from '../../assets/images/learn.png'; 
 import prep from '../../assets/images/prep.png';
 import job from '../../assets/images/job.png';
@@ -34,6 +34,7 @@ import kis from '../../assets/images/kis.png';
 import magnus from '../../assets/images/magnus.png';
 import Magnus from '../Magnus/Magnus.js';
 import ContactMain from '../Contacts/ContactMain.js';
+import InPerson from '../InPerson/InPerson.js';
 const HomeMain = () => {
   const navigation = useNavigation();
   const { account } = useAccountContext() ;
@@ -164,8 +165,8 @@ const HomeMain = () => {
 
 
       <Tab.Screen
-        name="Jobs"
-        component={Jobs}
+        name="InPerson"
+        component={InPerson}
         options={{
           headerLeft: () => (
             <Profile />

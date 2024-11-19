@@ -10,8 +10,8 @@ import { useNavigation } from '@react-navigation/native';
 import messaging from '@react-native-firebase/messaging';
 import { PermissionsAndroid } from 'react-native';
 import Contacts from 'react-native-contacts';
+import sea from '../../assets/images/sea.png';
 const Contactss = () => {
-
     const navigation = useNavigation();
     const[contacts,setContacts]=useState([]);
     const [name, setName] = useState('');
@@ -117,6 +117,7 @@ const Contactss = () => {
                     <View style={{paddingHorizontal:20}}>
                     <WelcomeMessage/>
                     <View style={styles.searchContainer}>
+                    <Image tintColor={'grey'} source={sea} style={{height:16,width:16}} />
                         <TextInput
                             placeholder="Search Contacts"
                             placeholderTextColor={'lightgrey'}
@@ -216,9 +217,13 @@ const styles = StyleSheet.create({
         borderRadius: 50,
         paddingHorizontal: 15,
         marginTop:8,
+        flexDirection:'row',
+        alignItems:'center'
     },
     searchInput: {
         fontSize: 16,
         color: 'black',
+        paddingLeft:8
+
     },
 })

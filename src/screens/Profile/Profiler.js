@@ -8,6 +8,13 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import prof from '../../assets/images/prof.png';
 import { postFeed } from '../../api/api';
 import { useNavigation } from '@react-navigation/native';
+import Options from '../../components/Options';
+import HeadWithTorsoIcon from '../../assets/icons/user-svgrepo.svg';
+import SignOutIcon from '../../assets/icons/sign-out-svgrepo.svg';
+import Terms from '../../assets/icons/terms_of_use.svg';
+import ContactUs from '../../assets/icons/contact_us.svg';
+import FAQ from '../../assets/icons/faq.svg';
+import lang from '../../assets/icons/lang.png';
 const Profiler = () => {
   const navigation=useNavigation();
     const [des, setDes] = useState('');
@@ -15,38 +22,7 @@ const Profiler = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(''); // New state for error message
     const [success,setSuccess]=useState(false);
-    useEffect(() => {
-        const fetch = async () => {
-            const user = await AsyncStorage.getItem('username');
-            setName(user);
-        };
-        fetch();
-    }, []);
 
-    const handleSendFeedback =async () => {
-        if (des.trim() === '') {
-            setError('Please provide feedback.'); // Set error message if feedback is empty
-        } else {
-          setLoading(true);
-            try{
-              const data={
-                "username":name,
-                "message":des
-              }
-              const response=await postFeed(data);
-              if(response.message){
-                setSuccess(true);
-                setTimeout(() => {
-                    setSuccess(false);
-                }, 2000);
-              }
-            }catch(error){
-              setError('Error occurred');
-            }finally{
-              setLoading(false);
-            }
-        }
-    };
 
     const WelcomeMessage = () => {
         return (
@@ -86,35 +62,58 @@ const Profiler = () => {
                             <Text style={[{ fontSize: 18, color: 'black', fontWeight: '600', letterSpacing: 0.2 }, styles.font]}>
                                 Part of <Text style={styles.blueText}>Docs Chat Community</Text>
                             </Text>
-                            <View style={{ flexDirection: 'column', gap: 24, marginTop: 12 }}>
-                                <Input
-                                    value={des}
-                                    label="Feedback"
-                                    labelStyle={styles.label}
-                                    placeholder="Leave us feedback"
-                                    containerStyle={styles.inputContainer}
-                                    setValue={(val: String) => setDes(val)}
-                                    multiline={true}
-                                    numberOfLines={6}
-                                />
-                                {error ? <Text style={styles.errorText}>{error}</Text> : null} 
+                            <View className="w-full mt-[-8]">
+                            <View className="bg-[#EBEDF0] h-0.5 mt-9 mb-2 w-full" />
+                            <Options
+                                className="mt-6 w-full"
+                                svgIcon={<HeadWithTorsoIcon />}
+                                text="Personal Details"
+                                textStyle={styles.font}
+                                // onPress={OnPressPersonalDetails}
+                            />
+                            <Options
+                                className="mt-6 w-full"
+                                svgIcon={<Image source={lang} style={{height:23,width:23}}/>}
+                                text="Language settings"
+                                textStyle={styles.font}
+                                onPress={()=>{
+                                    navigation.navigate('Language')
+                                }}
+                            />
+                            <Options
+                                className="mt-6 w-full"
+                                svgIcon={<Terms />}
+                                text="Term and conditions"
+                                textStyle={styles.font}
 
-                                <TouchableOpacity
-                                    style={{ justifyContent: 'center', alignItems: 'center', alignSelf: 'center', width: '100%', backgroundColor: 'black', borderRadius: 4 }}
-                                    onPress={handleSendFeedback} // Attach the validation handler here
-                                >
-                                    <Text style={[{ color: 'white', fontSize: 15, paddingVertical: 14 }, styles.font]}>Send Feedback</Text>
-                                </TouchableOpacity>
+                                // onPress={OnPressPersonalDetails}
+                            />
+                            <Options
+                                className="mt-6 w-full"
+                                svgIcon={<FAQ />}
+                                text="Frequenlty Asked Questions"
+                                textStyle={styles.font}
 
-                                <TouchableOpacity
-                                    style={{ justifyContent: 'center', alignItems: 'center', alignSelf: 'center', width: '100%', backgroundColor: 'grey', borderRadius: 4 }}
-                                    onPress={async()=>{
-                                      await AsyncStorage.removeItem('loggedin');
-                                      navigation.navigate('LoginScreen');
-                                    }}
-                                >
-                                    <Text style={[{ color: 'white', fontSize: 15, paddingVertical: 14 }, styles.font]}>Sign Out</Text>
-                                </TouchableOpacity>
+                                // onPress={OnPressPersonalDetails}
+                            />
+                            <Options
+                                className="mt-6 w-full"
+                                svgIcon={<ContactUs />}
+                                text="Personal Details"
+                                textStyle={styles.font}
+
+                                // onPress={OnPressPersonalDetails}
+                            />
+                            <Options
+                                className="mt-5 w-full"
+                                svgIcon={<SignOutIcon />}
+                                text="Sign out"
+                                textClassName="text-[#DE2929] "
+                                hideArrow={true}
+                                onPress={null}
+                                textStyle={styles.font}
+                            />
+                            <View className="bg-[#EBEDF0] h-0.5 mt-9 mb-2 w-full" />
                             </View>
                         </View>
                     )}

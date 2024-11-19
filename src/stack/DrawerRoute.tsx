@@ -1,6 +1,6 @@
 import { createDrawerNavigator, DrawerContent, DrawerContentScrollView, DrawerItemList, DrawerContentComponentProps, DrawerView, useDrawerProgress, DrawerItem, DrawerHeaderProps } from "@react-navigation/drawer";
 import HomeMain from '../screens/HomeMain/HomeMain.js';
-import AppliedJob from "../screens/Jobs/AppliedJob.js";
+import AppliedJob from "../screens/InPerson/AppliedJob.js";
 import HomeOutline from "../assets/icons/HomeOutlineIcon.svg";
 import HomeFill from "../assets/icons/HomeIcon.svg";
 import BrifCaseIcon from "../assets/icons/BrifCase.svg"
@@ -22,6 +22,7 @@ import GroupChat from "../screens/GroupChat/GroupChat.js";
 import { useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Profiler from "../screens/Profile/Profiler.js";
+import Settings from "../screens/Profile/Settings.js";
 const Drawer = createDrawerNavigator();
 function customDrawerContent(props: DrawerContentComponentProps) {
     const[name,setName]=useState('');
@@ -166,7 +167,7 @@ export default function DrawerRoute() {
                         headerShown: false,
                     }}
                 />
-                <Drawer.Screen name="Profiler" component={Profiler}
+                <Drawer.Screen name="Settings" component={Settings}
                     options={{
                         drawerLabel: "Account settings",
                         title: "Profile",

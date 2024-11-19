@@ -56,7 +56,7 @@ const Router = () => {
     }
 
     return (
-        <Stack.Navigator initialRouteName={'Home'} screenOptions={{ headerShown: false }}>
+        <Stack.Navigator initialRouteName={'Onboarding'} screenOptions={{ headerShown: false }}>
             <Stack.Screen name='ContactMain' component={ContactMain} options={{ headerShown: false }} />
             <Stack.Screen name='Onboarding' component={Onboarding} options={{ headerShown: false }} />
             <Stack.Screen name='LoginScreen' component={Login} options={{ headerShown: false }} />

@@ -57,10 +57,17 @@ export function Login() {
   };
 
   const handleLogin = async () => {
+    setLoading(true);
     if (validateFields()) {
-      setLoading(true);
-      setLoginError(''); // Reset login error on new login attempt
-      navigation.navigate('Mfa');
+      try{
+        setLoginError(''); // Reset login error on new login attempt
+        AsyncStorage.setItem('userphone',phone.trim());
+        AsyncStorage.setItem('loggedin','true');
+      }catch(e){
+        console.log(e);
+      }finally{
+        navigation.navigate('Home');
+      }
     }
     else{
     }
