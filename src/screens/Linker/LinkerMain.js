@@ -4,12 +4,9 @@ import { createStackNavigator } from '@react-navigation/stack';
 const Stack = createStackNavigator();
 const {useAuthContext} = require('../../hooks/Context');
 import { useNavigation } from '@react-navigation/native';
-import Contactss from './Contacts';
-import ContactChat from './ContactChat';
 import { CardStyleInterpolators } from '@react-navigation/stack';
-import Call from './Call';
-import NewChat from './NewChat';
-const ContactMain = () => {
+import Linker from './Linker';
+const LinkerMain = () => {
   const navigation=useNavigation();
   const{logout}=useAuthContext();
   return (
@@ -17,39 +14,12 @@ const ContactMain = () => {
     screenOptions={{
         cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS, // for a horizontal slide
         gestureEnabled: true,
-        gestureDirection: 'horizontal', // direction of the slide
+        gestureDirection: 'vertical', // direction of the slide
       }}
     >
       <Stack.Screen
-        name="Contacts"
-        component={Contactss}
-        options={{
-          headerShown: false,
-          headerTitle: '',
-          headerTitleAlign: 'center',
-        }}
-      />
-      <Stack.Screen
-        name="ContactChat"
-        component={ContactChat}
-        options={{
-          headerShown: false,
-          headerTitle: '',
-          headerTitleAlign: 'center',
-        }}
-      />
-      <Stack.Screen
-        name="Call"
-        component={Call}
-        options={{
-          headerShown: false,
-          headerTitle: '',
-          headerTitleAlign: 'center',
-        }}
-      />
-      <Stack.Screen
-        name="NewChat"
-        component={NewChat}
+        name="Linker"
+        component={Linker}
         options={{
           headerShown: false,
           headerTitle: '',
@@ -81,4 +51,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ContactMain;
+export default LinkerMain;

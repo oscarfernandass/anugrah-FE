@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { FlatList, Image, StyleSheet, Text, TextInput, TouchableOpacity, View, KeyboardAvoidingView, Platform ,PermissionsAndroid, Alert,Keyboard, ImageBackground} from 'react-native';
 import { useRoute } from '@react-navigation/native';
 import { rotate } from 'react-native-redash';
@@ -16,71 +16,21 @@ import { useNavigation } from '@react-navigation/native';
 import RNImmediatePhoneCall from 'react-native-immediate-phone-call';
 import BackgroundService from 'react-native-background-actions';
 import { launchImageLibrary } from 'react-native-image-picker';
+import rob from '../../assets/images/rob.png';
 import attach from '../../assets/images/attach.png';
-import send from '../../assets/images/send.png';
-import input from '../../components/Input/input';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
-import { database , storage } from '../../../firebase';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { onSnapshot, query, orderBy} from 'firebase/firestore';
-import RNFS from 'react-native-fs';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useFocusEffect } from '@react-navigation/native';
-import video from '../../assets/images/video.png';
-import RenderMessage from './RenderMessage';
 import back from '../../assets/images/back.jpg';
-const ContactChat = () => {
-  const navigation=useNavigation();
-  const route=useRoute();
-  const [messages, setMessages] = useState([]);
+import send from '../../assets/images/send.png';
+
+const NewChat = () => {
+    const navigation=useNavigation();
+    const route=useRoute();
+  const [messages, setMessages] = useState([
+    { id: '1', text: 'Hello!', sender: true },
+    { id: '2', text: 'Hi, how can I help you?', sender: false },
+  ]);
   const [inputText, setInputText] = useState('');
   const [recording, setRecording] = useState(false);
   const [imagesend,setImageSend] = useState('');
-  const [senderPhoneNumber, setSenderPhoneNumber] = useState('');
-  const flex = route?.params?.number?.trim()?.replace(/^\+91/, ''); // Remove "+91" if present
-  const userPhoneNumber = flex?.replace(/\s+/g, '').trim();
-  useFocusEffect(
-    useCallback(() => {
-      const initializeAudio = async () => {
-        await requestAudioPermission();
-        await initAudioRecord();
-      };
-      initializeAudio();
-      return () => {
-        // Optional cleanup logic, if necessary
-      };
-    }, [])
-  );
-    useEffect(()=>{
-      const setUser=async()=>{
-        const number=await AsyncStorage.getItem('userphone');
-        setSenderPhoneNumber(number);
-        console.log(number,"???",userPhoneNumber)
-      }
-      setUser();
-    })
-
-  useEffect(() => {
-    if (!senderPhoneNumber || !userPhoneNumber) return;
-  
-    const chatPath = [senderPhoneNumber, userPhoneNumber].sort().join('_');
-    const q = query(
-      collection(database, 'chats', chatPath, 'messages'),
-      orderBy('timestamp', 'asc')
-    );
-  
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const fetchedMessages = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-      setMessages(fetchedMessages);
-    });
-  
-    return unsubscribe;
-  }, [senderPhoneNumber, userPhoneNumber]);
-  
-
   const flatListRef = useRef();
 
   const selectImage = () => {
@@ -94,7 +44,7 @@ const ContactChat = () => {
   
     launchImageLibrary(options, (response) => {
       if (response.didCancel) {
-        console.log('User cancelled image picker');
+        Alert.alert('User cancelled image picker');
         return;
       } else if (response.errorCode) {
         Alert.alert('Image Picker Error:', response.errorMessage);
@@ -103,7 +53,7 @@ const ContactChat = () => {
   
       if (response.assets && response.assets.length > 0) {
         console.log("Image", response.assets[0]);
-        setImageSend(response.assets[0]); 
+        setImageSend(response.assets[0]); // Assuming `setProfileImage` updates your state
       }
     });
   };
@@ -123,6 +73,8 @@ const ContactChat = () => {
       );
   
       if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+        // await BackgroundService.start(veryIntensiveTask, options);
+        // startRecording();
         console.log(route?.params?.number);
         RNImmediatePhoneCall.immediatePhoneCall('+918098167783');
       } else {
@@ -133,6 +85,18 @@ const ContactChat = () => {
     }
   };
 
+  useEffect(() => {
+      requestAudioPermission();
+      initAudioRecord();
+    }, []);
+    
+    
+    // useEffect(() => {
+    //     // Scroll to the bottom whenever messages are updated
+    //     if (flatListRef.current) {
+    //         flatListRef.current.scrollToEnd({ animated: true });
+    //     }
+    // }, [messages,]);
 
     const micScale = useSharedValue(1);
   const micAnimatedStyle = useAnimatedStyle(() => ({
@@ -143,7 +107,7 @@ const ContactChat = () => {
 const requestAudioPermission = async () => {
     const granted = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.RECORD_AUDIO);
     if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
-        Alert.alert('Record audio permission denied');
+        console.log('Record audio permission denied');
     }
 };
 
@@ -170,105 +134,69 @@ const startRecording = async () => {
       micScale.value = withSpring(1);
       const audioFile = await AudioRecord.stop();
       sendAudioMessage(audioFile);
+    //   setTimeout(async() => {
+    //     await BackgroundService.stop();
+    // }, 2000);
     }
   };
 
-  const sendAudioMessage = async (audioFile) => {
-    if (!senderPhoneNumber || !userPhoneNumber) {
-      console.error('Sender or receiver phone number is missing.');
-      return;
+  const sendAudioMessage = (audioFile) => {
+    setMessages([...messages, { id: Date.now().toString(), text: '', audioFile, sender: true }]);
+  };
+
+  const sendTextMessage = () => {
+    if (inputText.trim()) {
+      setMessages([...messages, { id: Date.now().toString(), text: inputText, sender: true }]);
+      setInputText('');
     }
-  
-    try {
-      // Read the file as Base64
-      const base64Audio = await RNFS.readFile(audioFile, 'base64'); // Convert audio to Base64
-      console.log(base64Audio,"????????????????????")
-      const newMessage = {
-        text: '',
-        base64Audio: base64Audio, // Save as Base64
-        sender: senderPhoneNumber,
-        receiver: userPhoneNumber,
-        timestamp: serverTimestamp(),
+    const sendImageMessage = () => {
+        if (imagesend) {
+          const newMessage = {
+            id: Date.now().toString(),
+            text: inputText, // Optional text with the image
+            base64Image: imagesend.base64, // Send the base64 string of the image
+            sender: true,
+          };
+          setMessages([...messages, newMessage]);
+          setImageSend(null); // Clear the image after sending
+          setInputText(''); // Clear the text input
+        }
       };
-  
-      const chatPath = [senderPhoneNumber, userPhoneNumber].sort().join('_');
-      await addDoc(collection(database, 'chats', chatPath, 'messages'), newMessage);
-  
-      console.log('Audio message sent successfully!');
-    } catch (error) {
-      console.error('Error sending audio message:', error);
-    }
+      sendImageMessage();
   };
-  
 
-  const sendTextOrImageMessage = async () => {
-    if (!senderPhoneNumber || !userPhoneNumber) {
-      console.error('Sender or receiver phone number is missing.');
-      return;
-    }
-  
-    // Save current inputs to local variables
-    const textToSend = inputText.trim();
-    const imageToSend = imagesend?.base64;
-  
-    // Clear inputs immediately
-    setInputText('');
-    setImageSend(null);
-  
-    if (textToSend || imageToSend) {
-      const newMessage = {
-        text: textToSend,
-        base64Image: imageToSend || null, // Store the base64 string
-        sender: senderPhoneNumber,
-        receiver: userPhoneNumber,
-        timestamp: serverTimestamp(),
-      };
-  
-      try {
-        const chatPath = [senderPhoneNumber, userPhoneNumber].sort().join('_');
-        await addDoc(collection(database, 'chats', chatPath, 'messages'), newMessage);
-        console.log('Message sent successfully!');
-      } catch (error) {
-        console.error('Error sending message:', error);
-      }
-    }
-  };
-  
-
-
-  
-
-const playAudio = async (base64Audio) => {
-  if (!base64Audio) {
-    console.error('No audio data to play.');
-    return;
-  }
-
-  try {
-    // Generate a unique file path to save the audio
-    const filePath = `${RNFS.CachesDirectoryPath}/audio_${Date.now()}.wav`;
-
-    // Write the Base64 audio data to the file
-    await RNFS.writeFile(filePath, base64Audio, 'base64');
-
-    // Create a new Sound object to play the file
-    const sound = new Sound(filePath, '', (error) => {
+  const playAudio = (audioFile) => {
+    const sound = new Sound(audioFile, '', (error) => {
       if (error) {
-        console.error('Failed to load the sound', error);
+        console.log('Failed to load the sound', error);
         return;
       }
-
       sound.play((success) => {
-        if (!success) {
-          console.error('Failed to play the sound');
-        }
-        sound.release(); // Release resource after playing
+        if (!success) console.log('Playback failed');
       });
     });
-  } catch (error) {
-    console.error('Error playing audio:', error);
-  }
-};
+  };
+
+  const renderMessage = ({ item }) => (
+    <View style={[styles.messageContainer, item.sender ? styles.senderContainer : styles.receiverContainer]}>
+      <Image
+        source={item.sender?require('../../assets/images/prof.png'):rob}
+        style={[styles.avatar,{marginLeft:item.sender?4:0, marginRight:item.sender?0:4}]}
+      />
+            {item.text ? (
+      <Text style={[styles.messageText, item.sender ? styles.senderText : styles.receiverText]}>
+        {item.text}
+      </Text>
+      ) : (
+        item.audioFile && (
+          <TouchableOpacity onPress={() => playAudio(item.audioFile)}>
+            <Image tintColor={'#0D69D7'} source={voiceplay} style={{width:60,height:60}} />
+          </TouchableOpacity>
+        )
+      )}
+    </View>
+  );
+
   return (
     <KeyboardAvoidingView style={[styles.container]} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
     <ImageBackground  source={back} style={styles.container}>
@@ -279,46 +207,28 @@ const playAudio = async (base64Audio) => {
             }}>
         <Image source={backl} style={{height:25,width:25,marginRight:3}} />
             </TouchableOpacity>
-        <Image source={route?.params?.image===null?require('../../assets/images/profile.png'):{uri:route?.params?.image}} style={{width:40,height:40,borderRadius:50}}/>
-        <Text style={styles.headerText}>
-          {route?.params?.name?.length > 10
-            ? `${route.params.name.slice(0, 16)}...`
-            : route?.params?.name}
-        </Text>
-
+        <Image source={rob} style={{width:40,height:40,borderRadius:50}}/>
+        <Text style={styles.headerText}>AI Chat</Text>
         </View>
-        <TouchableOpacity onPress={makePhoneCall} style={{marginRight:0}}>
+        <TouchableOpacity onPress={makePhoneCall} style={{marginRight:5}}>
         <Image source={call} style={{width:18,height:18}}/>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={()=>{
-              navigation.navigate('Call',{number:userPhoneNumber})
-            }} style={{marginRight:5}}>
-        <Image tintColor={'white'} source={video} style={{width:25,height:25}}/>
         </TouchableOpacity>
       </View>
       <FlatList
         ref={flatListRef}
         data={[...messages].reverse()}
-        renderItem={({ item }) => (
-          <RenderMessage
-            item={item}
-            senderPhoneNumber={senderPhoneNumber}
-            route={route}
-            playAudio={playAudio}
-            voiceplay={voiceplay}
-          />
-        )}
+        renderItem={renderMessage}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.messageList}
-        // onContentSizeChange={() => flatListRef.current.scrollToStart({ animated: true })}
+        // onContentSizeChange={() => flatListRef.current.scrollToEnd({ animated: true })}
         inverted
       />
-      <View style={[styles.inputContainer,
-        // { paddingTop: marginBottom }
-        ]}>
 
-
-        {imagesend && (
+<View style={[styles.inputContainer,
+  // { paddingTop: marginBottom }
+  ]}>
+      
+{imagesend && (
           <View style={styles.imagePreviewContainer}>
             <Image
               source={{ uri: imagesend.uri }}
@@ -344,9 +254,9 @@ const playAudio = async (base64Audio) => {
           </View>
         )}
 
-        <View style={styles.inputCon}>
-          <TouchableOpacity onPress={selectImage} style={{justifyContent:'center',alignItems:'center',backgroundColor:'#0D69D7',padding:10,borderRadius:50}}>
-                <Image tintColor={'white'} source={attach} style={{ width: 20, height: 20 }} />
+    <View style={styles.inputCon}>
+        <TouchableOpacity onPress={selectImage} style={{justifyContent:'center',alignItems:'center',backgroundColor:'#0D69D7',padding:10,borderRadius:50}}>
+            <Image tintColor={'white'} source={attach} style={{ width: 20, height: 20 }} />
         </TouchableOpacity>
         <TextInput
           style={styles.input}
@@ -354,46 +264,38 @@ const playAudio = async (base64Audio) => {
           onChangeText={setInputText}
           placeholder="Type a message..."
           placeholderTextColor="gray"
-          />
+        />
             <Animated.View style={micAnimatedStyle}>
         <TouchableOpacity onPressIn={startRecording} onPressOut={stopRecording} style={{justifyContent:'center',alignItems:'center',backgroundColor:'#0D69D7',padding:10,borderRadius:50}}>
                 <Image source={micer} style={{ width: 20, height: 20 }} />
         </TouchableOpacity>
             </Animated.View>
-            <TouchableOpacity onPress={sendTextOrImageMessage} style={{justifyContent:'center',alignItems:'center',backgroundColor:'#0D69D7',padding:10,borderRadius:50}}>
+            <TouchableOpacity onPress={sendTextMessage} style={{justifyContent:'center',alignItems:'center',backgroundColor:'#0D69D7',padding:10,borderRadius:50}}>
                 <Image tintColor={'white'} source={send} style={{ width: 20, height: 20,alignSelf:'center',marginLeft:3 }} />
         </TouchableOpacity>
       </View>
     </View>
-
-    </ImageBackground>
+      </ImageBackground>
     </KeyboardAvoidingView>
   );
 };
 
-export default ContactChat;
+export default NewChat;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#F8F8F8',
   },
-  imagePreviewContainer: {
-    // flexDirection:'column',
-    // alignItems: 'center',
-    // marginRight: 10,
-  },
-  imagePreview: {
-    width: 100,
-    height: 100,
-    borderRadius: 5,
-    alignSelf:'flex-start'
-    // marginRight: 5,
-  },
-  removeImageText: {
-    fontSize: 16,
-    color: 'black',
-    // fontWeight: 'bold',
+  inputCon:{
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent:'space-evenly',
+    gap:5,
+    // padding: 10,
+    // borderTopWidth: 1,
+    borderColor: '#ddd',
+    backgroundColor: 'white',
   },
   header: {
       flexDirection:'row',
@@ -414,11 +316,22 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: 'bold',
     marginLeft:5,
-    // width:'65%'
   },
   messageList: {
     flexGrow: 1,
     padding: 16,
+  },
+  removeImageText: {
+    fontSize: 16,
+    color: 'black',
+    // fontWeight: 'bold',
+  },
+  imagePreview: {
+    width: 100,
+    height: 100,
+    borderRadius: 5,
+    alignSelf:'flex-start'
+    // marginRight: 5,
   },
   messageContainer: {
     flexDirection: 'row',
@@ -463,24 +376,14 @@ const styles = StyleSheet.create({
     borderColor: '#ddd',
     backgroundColor: 'white',
   },
-  inputCon:{
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent:'space-evenly',
-    gap:5,
-    // padding: 10,
-    // borderTopWidth: 1,
-    borderColor: '#ddd',
-    backgroundColor: 'white',
-  },
   input: {
     flex: 1,
     fontSize: 16,
     padding: 10,
-    borderRadius: 50,
+    borderRadius: 20,
     backgroundColor: '#F1F1F1',
-    color:'black'
     // marginRight: 10,
+    color:'black'
   },
   sendButton: {
     paddingVertical: 10,

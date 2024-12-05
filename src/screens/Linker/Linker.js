@@ -6,7 +6,10 @@ import ground from '../../assets/images/ground.png';
 import send from '../../assets/images/send.png';
 import Voice from '@react-native-voice/voice';
 import LinearGradient from 'react-native-linear-gradient';
-const InPerson = () => {
+import add from '../../assets/images/add.png';
+import { useNavigation } from '@react-navigation/native';
+const Linker = () => {
+    const navigation=useNavigation();
     const [inputText, setInputText] = useState('');
     const [isSpeaking, setIsSpeaking] = useState(false);
     const lottieRef = useRef(null); // Reference to control the Lottie animation
@@ -69,29 +72,6 @@ const InPerson = () => {
             Tts.removeAllListeners('tts-cancel');
         };
     }, []);
-
-    useEffect(() => {
-        // Set a timeout to show the introduction after 3 seconds (or adjust as needed)
-        const timeout = setTimeout(() => {
-          Speak("Hello i am patrick")
-        }, 1000); // 3-second delay (3000 milliseconds)
-        const timeout1 = setTimeout(() => {
-          Speak("i am your voice spreading assistant")
-        }, 2000); // 3-second delay (3000 milliseconds)
-        const timeout2 = setTimeout(() => {
-          Speak("i speak on your behalf ")
-        }, 2000); // 3-second delay (3000 milliseconds)
-        setTimeout(() => addMessage({ text: "Tap and speak to convey your message 😄", sender: 'assistant', type: 'speak' }), 1500);
-
-    
-        // Cleanup function to clear the timeout if the component is unmounted
-        return () =>{
-            clearTimeout(timeout)
-            clearTimeout(timeout1)
-            clearTimeout(timeout2)
-        };
-        // return () => clearTimeout(timeout1);
-      }, []);
     
     const onSpeechStart = () => {
         setIsSpeaking(true);
@@ -141,10 +121,10 @@ const InPerson = () => {
         return (
             <View style={{ paddingTop: 0,paddingLeft:5}}>
                 <Text style={[{ fontSize: 18, color: 'black', fontWeight: '600', letterSpacing: 0.2 }, styles.font]}>
-                    I am <Text style={styles.blueText}>Patrick</Text>
+                    Decrypt <Text style={styles.blueText}>link</Text>
                 </Text>
                 <Text style={[{ fontSize: 18, color: 'black', fontWeight: '600', letterSpacing: 0.2 }, styles.font]}>
-                    <Text style={styles.blueText}>I speak</Text> on your behalf
+                    <Text style={styles.blueText}>Description </Text> summary...
                 </Text>
             </View>
         );
@@ -195,15 +175,19 @@ const InPerson = () => {
             behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         >
             <ImageBackground source={ground} style={styles.container}>
+            <TouchableOpacity onPress={()=>{
+               navigation.push('Linker');
+            }} style={{position:'absolute', bottom:80,right:20,backgroundColor:'black',borderColor:'#0D69D7',borderWidth:4,borderRadius:10,justifyContent:'center',alignItems:'center',zIndex:100000,padding:8}}>
+                <Image source={add} tintColor={'white'} style={{width:30,height:30}} />
+            </TouchableOpacity>
                 <View style={{paddingHorizontal:20}}>
-                    <View style={{flexDirection:'row',justifyContent:'space-between',alignItems:'center',marginTop:0,backgroundColor:'white'}}>
+                    <View style={{flexDirection:'row',justifyContent:'space-between',alignItems:'center',marginTop:0,backgroundColor:'transparent'}}>
                     <WelcomeMessage />
                     <LottieView
-                        ref={lottieRef}
-                        source={require('../../assets/lottie/patrick.json')}
-                        autoPlay={false} // Disable autoplay
-                        loop={false} // Animation should not loop
-                        style={{ height: 160, width: 160, marginTop: 0,marginLeft:-10}}
+                        source={require('../../assets/lottie/linkes.json')}
+                        autoPlay={true} // Disable autoplay
+                        loop={true} // Animation should not loop
+                        style={{ height: 90, width: 90,}}
                         />
                     </View>
                     </View>
@@ -231,7 +215,7 @@ const InPerson = () => {
     );
 };
 
-export default InPerson;
+export default Linker;
 
 const styles = StyleSheet.create({
     container: {
@@ -309,6 +293,6 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         flexGrow: 1,
         justifyContent: 'flex-end',
-        paddingTop:80
+        paddingTop:160
     },
 });

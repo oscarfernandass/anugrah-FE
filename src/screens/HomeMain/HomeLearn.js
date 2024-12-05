@@ -1,5 +1,5 @@
-import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import React from 'react'
+import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View ,Alert} from 'react-native'
+import React,{useEffect} from 'react'
 import LinearGradient from 'react-native-linear-gradient'
 import LottieView from 'lottie-react-native'
 import gift from '../../assets/lottie/gifte.json';
@@ -13,7 +13,9 @@ import car1 from '../../assets/images/car1.jpg';
 import car2 from '../../assets/images/car2.jpg';
 import car3 from '../../assets/images/car3.jpg';
 import car4 from '../../assets/images/car4.jpg';
+import Shake from 'react-native-shake';
 const HomeLearn = () => {
+
   const carouselData = [
     {
       image: car1,
@@ -137,7 +139,6 @@ const HomeLearn = () => {
 }
 
 export default HomeLearn
-
 const styles = StyleSheet.create({
   container:{
     // flex:1,

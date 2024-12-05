@@ -114,6 +114,7 @@ const Contactss = () => {
             keyboardVerticalOffset={100} // Adjust this offset as needed
         >
             <ImageBackground source={ground} style={styles.container}>
+
                     <View style={{paddingHorizontal:20}}>
                     <WelcomeMessage/>
                     <View style={styles.searchContainer}>

@@ -1,23 +1,12 @@
 import React from 'react';
 import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { useNavigation } from '@react-navigation/native';
+import { Link, useNavigation } from '@react-navigation/native';
 import HomeLearn from './HomeLearn';
-import Preparation from '../Preparation/Preparation.js';
-import Jobs from '../InPerson/InPerson.js';
-import learn from '../../assets/images/learn.png'; 
-import prep from '../../assets/images/prep.png';
-import job from '../../assets/images/job.png';
+import Preparation from '../Linker/Linker.js';
 import Notifi from '../../assets/icons/Notifi.svg';
 import Mail from '../../assets/icons/Mail.svg';
 import LearnMain from './LearnMain';
-import Learner from '../../assets/icons/Learn.svg';
-import Jober from '../../assets/icons/Jobs.svg';
-import Preper from '../../assets/icons/Prep.svg';
-import learner from '../../assets/images/learner.png';
-import preper from '../../assets/images/preper.png';
-import prof from '../../assets/images/prof.png';
-import jober from '../../assets/images/jober.png';
 import ho from '../../assets/images/ho.png';
 import base from '../../assets/images/base.png';
 import { useAccountContext } from '../../hooks/Context.js';
@@ -35,6 +24,12 @@ import magnus from '../../assets/images/magnus.png';
 import Magnus from '../Magnus/Magnus.js';
 import ContactMain from '../Contacts/ContactMain.js';
 import InPerson from '../InPerson/InPerson.js';
+import mac from '../../assets/images/mac.png';
+import yout from '../../assets/images/yout.png';
+import pers from '../../assets/images/pers.png';
+import { Line } from 'react-native-svg';
+import Linker from '../Linker/Linker.js';
+import LinkerMain from '../Linker/LinkerMain.js';
 const HomeMain = () => {
   const navigation = useNavigation();
   const { account } = useAccountContext() ;
@@ -73,8 +68,8 @@ const HomeMain = () => {
         }}
       />
       <Tab.Screen
-        name="Prep"
-        component={Preparation}
+        name="LinkerMain"
+        component={LinkerMain}
         options={{
           headerLeft: () => (
             <Profile />
@@ -108,7 +103,7 @@ const HomeMain = () => {
               {
                 <View style={{backgroundColor: focused?'#0D69D7':null ,paddingVertical:4,paddingHorizontal:'8%',borderRadius:6}}>
                   <Image
-                    source={base}
+                    source={yout}
                     style={{ tintColor: 'white' , }}
                     className="w-[28px] h-[28px]"
                   />
@@ -116,14 +111,14 @@ const HomeMain = () => {
               }
               <Text style={[{ fontSize:13, color:'white',marginTop:-5},styles.font]}
               className="font-[600]"
-              >Base</Text>
+              >Link</Text>
             </View>
           ),
         }}
       />
 
 <Tab.Screen
-        name="Magnus"
+        name="ContactMain"
         component={ContactMain}
         options={{
           headerLeft: () => (
@@ -147,9 +142,9 @@ const HomeMain = () => {
             // className="w-[116px] h-[48px] p-[6px] gap-[0px] rounded-tl-[40px] "
             >
               {
-                <View style={{backgroundColor: focused?'#0D69D7':null ,paddingVertical:6.5,paddingHorizontal:'10%',borderRadius:50}}>
+                <View style={{backgroundColor: focused?'#0D69D7':null ,paddingVertical:5,paddingHorizontal:'8%',borderRadius:6}}>
                   <Image
-                    source={magnus}
+                    source={mac}
                     style={{ tintColor: 'white'}}
                     className="w-[28px] h-[28px]"
                   />
@@ -157,7 +152,7 @@ const HomeMain = () => {
               }
               <Text style={[{ fontSize:13, color:'white',marginTop:-5},styles.font]}
               className="font-[600]"
-              >Magnus</Text>
+              >Call</Text>
             </View>
           ),
         }}
@@ -205,7 +200,7 @@ const HomeMain = () => {
               {
                 <View style={{backgroundColor: focused?'#0D69D7':null ,paddingVertical:4,paddingHorizontal:'8%',borderRadius:6}}>
                   <Image
-                    source={kno}
+                    source={pers}
                     style={{ tintColor: 'white' , }}
                     className="w-[28px] h-[28px]"
                   />
@@ -213,7 +208,7 @@ const HomeMain = () => {
               }
               <Text style={[{ fontSize:13, color:'white',marginTop:-5},styles.font]}
               className="font-[600]"
-              >Choose</Text>
+              >Inperson</Text>
             </View>
           ),
         }}
