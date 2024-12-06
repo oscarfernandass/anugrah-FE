@@ -12,7 +12,7 @@ const Language = () => {
 
     const fetchLanguage = async () => {
         try {
-            const savedLanguage = await AsyncStorage.getItem('selectedLanguage');
+            const savedLanguage = await AsyncStorage.getItem('selected');
             if (savedLanguage) {
                 setSelectedLanguage(savedLanguage);
                 setCurrentSelection(savedLanguage);
@@ -41,18 +41,30 @@ const Language = () => {
         }
     };
 
+    const languageMapping = {
+        'English': 'english',
+        'हिंदी': 'hindi',
+        'বাংলা': 'bengali',
+        'తెలుగు': 'telugu',
+        'தமிழ்': 'tamil',
+        'मराठी': 'marathi',
+    };
+    
     const handleFixLanguage = async () => {
         try {
-            await AsyncStorage.setItem('selectedLanguage', currentSelection); // Save to AsyncStorage
+            const englishForm = languageMapping[currentSelection];
+            await AsyncStorage.setItem('selectedLanguage', englishForm); // Save the English form
+            await AsyncStorage.setItem('selected', currentSelection); // Save the English form
             ToastAndroid.show(
-                `Language set to ${currentSelection}`,
+                `Language set to ${englishForm}`,
                 ToastAndroid.SHORT
             );
         } catch (error) {
             console.error('Error saving language:', error);
         }
-        fetchLanguage()
+        fetchLanguage();
     };
+    
 
     const renderItem = ({ item }) => (
         <TouchableOpacity

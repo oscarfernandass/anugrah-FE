@@ -6,6 +6,7 @@ const {useAuthContext} = require('../../hooks/Context');
 import { useNavigation } from '@react-navigation/native';
 import { CardStyleInterpolators } from '@react-navigation/stack';
 import Linker from './Linker';
+import PageList from './PageList';
 const LinkerMain = () => {
   const navigation=useNavigation();
   const{logout}=useAuthContext();
@@ -20,6 +21,16 @@ const LinkerMain = () => {
       <Stack.Screen
         name="Linker"
         component={Linker}
+        options={{
+          headerShown: false,
+          headerTitle: '',
+          headerTitleAlign: 'center',
+        }}
+      />
+
+      <Stack.Screen
+        name="PageList"
+        component={PageList}
         options={{
           headerShown: false,
           headerTitle: '',

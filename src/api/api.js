@@ -1,9 +1,9 @@
 import { Alert } from "react-native";
 import axios from "./axios";
 
-export const registerUser = async (data) => {
+export const translateText = async (data) => {
   try {
-    const response = await axios.post('register',data, 
+    const response = await axios.post('text-translate',data, 
   {
       headers: {
         'Content-Type': 'application/json',
@@ -18,22 +18,33 @@ export const registerUser = async (data) => {
   }
 }
 
-export const loginUser = async (data) => {
+export const chatBotApi = async (data) => {
   try {
-    const response = await axios.post('login',data, 
-  {
-      headers: {
-        'Content-Type': 'application/json',
-      }
+    // Create a new FormData instance
+    const formData = new FormData();
+    // Append data to the FormData instance
+    formData.append('text', data.text);
+    if (data.image) {
+      formData.append('image', {
+        uri: data.image.uri,
+        type: data.image.type,
+        name: data.image.name,
+      });
     }
-  );
-    if(response) return response.data;
+    // Send the request with FormData
+    const response = await axios.post('chatbot', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    if (response) return response.data;
     else return false;
   } catch (error) {
     console.log(error);
     return false;
   }
-}
+};
+
 
 export const verifyOtp = async (data) => {
   try {
