@@ -19,13 +19,13 @@ import wel from '../assets/lottie/wel.json';
 import LottieView from 'lottie-react-native';
 import { useNavigation } from '@react-navigation/native';
 import neo from '../assets/images/neo.png';
-import { loginUser } from '../api/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import PhoneInput from 'react-native-phone-number-input';
 import torn from '../assets/images/torn.png';
 import skcet from '../assets/images/skcet.png';
+import { verifyOtp } from '../api/api';
 
-export function Login() {
+  const Login=()=>{
   const [userName, setUserName] = useState('');
   const [password, setPassword] = useState('');
   const [userNameError, setUserNameError] = useState('');
@@ -59,20 +59,31 @@ export function Login() {
   const handleLogin = async () => {
     setLoading(true);
     if (validateFields()) {
-      try{
+      try {
         setLoginError(''); // Reset login error on new login attempt
-        AsyncStorage.setItem('userphone',phone.trim());
-        AsyncStorage.setItem('loggedin','true');
-      }catch(e){
-        console.log(e);
-      }finally{
-        navigation.navigate('Home');
+  
+        const response = await verifyOtp({ number: phone.trim() });
+        if (response && response.otp) {
+          // Save the phone number to AsyncStorage
+          // Navigate to the Otp page, passing the phone number and OTP
+          navigation.navigate('Otp', {
+            phone: phone.trim(),
+            otp: response.otp,
+          });
+        } else {
+          Alert.alert('Login Failed', 'Invalid phone number or OTP generation failed.');
+        }
+      } catch (e) {
+        console.error('Login error:', e);
+        Alert.alert('Error', 'Something went wrong. Please try again later.');
+      } finally {
+        setLoading(false);
       }
-    }
-    else{
+    } else {
+      setLoading(false); // Stop loading spinner
     }
   };
-
+  
   return (
     <>
       <ScrollView style={styles.container}>
@@ -111,7 +122,7 @@ export function Login() {
                   placeholder="e.g. name@123"
                   containerStyle={styles.inputmargin}
                   setValue={(val: String) => setUserName(val)}
-                />
+                  />
                 {userNameError ? <Text style={styles.errorText}>{userNameError}</Text> : null}
                 <Text style={styles.label}>Phone</Text>
                 <PhoneInput
@@ -132,7 +143,7 @@ export function Login() {
                   placeholderTextColor: '#6D747A',
                   maxLength: 10, // Restrict input to 10 digits
                 }}
-              />
+                />
               {phoneError ? <Text style={styles.errorText}>{phoneError}</Text> : null}
                 {loginError ? <Text style={styles.errorText}>{loginError}</Text> : null} 
               </>
@@ -183,6 +194,7 @@ export function Login() {
     </>
   );
 }
+export default Login;
 
 const styles = StyleSheet.create({
   errorText: {

@@ -1,25 +1,34 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { StyleSheet, View, Alert, PermissionsAndroid, Text, Vibration, Button } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, View, Alert, PermissionsAndroid, Text } from 'react-native';
+import { ZegoUIKitPrebuiltCall, ONE_ON_ONE_VIDEO_CALL_CONFIG } from '@zegocloud/zego-uikit-prebuilt-call-rn';
+import { useRoute, useNavigation } from '@react-navigation/native';
 import AudioRecord from 'react-native-audio-record';
 import RNFS from 'react-native-fs';
+import { audioToTextApi } from '../../api/api';
+import { useRef } from 'react';
 const Call = () => {
-  const websocket = useRef(null);
-  const [recording, setRecording] = useState(false);
+  const route = useRoute();
+  const navigation = useNavigation();
+  const number = route?.params?.number;
+  const recordingActive = useRef(true);
+  const [pointerIndex, setPointerIndex] = useState(0);
+  const [translatedText, setTranslatedText] = useState(''); // For displaying `tword`
 
   useEffect(() => {
-    const initialize = async () => {
+    const initializeCall = async () => {
       try {
         await requestAudioPermission();
-        setupWebSocket();
+        initAudioRecord();
+        startContinuousRecording();
       } catch (error) {
         console.error('Error initializing call:', error);
       }
     };
 
-    initialize();
+    initializeCall();
 
     return () => {
-      cleanup();
+      recordingActive.current = false; // Stop recording
     };
   }, []);
 
@@ -27,104 +36,99 @@ const Call = () => {
     const granted = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.RECORD_AUDIO);
     if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
       Alert.alert('Record audio permission denied');
-      throw new Error('Permission denied');
     }
   };
 
-  const setupWebSocket = () => {
-    websocket.current = new WebSocket('ws://33f9-152-58-212-123.ngrok-free.app');
-
-    websocket.current.onopen = () => {
-      console.log('WebSocket connection established');
-    };
-
-    websocket.current.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      console.log('Server response:', data);
-    };
-
-    websocket.current.onerror = (error) => {
-      console.error('WebSocket error:', error);
-    };
-
-    websocket.current.onclose = () => {
-      console.log('WebSocket connection closed');
-    };
-  };
-
-  const startRecording = () => {
-    Vibration.vibrate(400);
-    setRecording(true);
-
+  const initAudioRecord = () => {
     const options = {
       sampleRate: 16000,
       channels: 1,
       bitsPerSample: 16,
-      wavFile: 'temp.wav', // Temporary file to save the audio
+      wavFile: `call_audio.wav`,
     };
-
     AudioRecord.init(options);
-    AudioRecord.start();
-    console.log('Recording started...');
   };
 
-  const stopRecording = async () => {
-    if (recording) {
-      setRecording(false);
-      const audioFile = await AudioRecord.stop(); // Stop recording and get the file path
-      console.log('Recording stopped. Audio saved at:', audioFile);
-      sendAudioMessage(audioFile);
+  const startContinuousRecording = async () => {
+    while (recordingActive.current) {
+      const pointerId = pointerIndex;
+      const filePath = await recordAudioSegment(4);
+      setPointerIndex((prev) => (prev + 1) % 2);
+      processAudioFile(filePath, pointerId);
     }
   };
 
-  const sendAudioMessage = async (audioFile) => {
-    try {
-      // Read the recorded file as Base64
-      const base64Audio = await RNFS.readFile(audioFile, 'base64');
-      console.log('Encoded Audio:', base64Audio);
+  const recordAudioSegment = async (duration) => {
+    AudioRecord.start();
+    await new Promise((resolve) => setTimeout(resolve, duration * 1000));
+    const filePath = await AudioRecord.stop();
+    return filePath;
+  };
 
-      if (websocket.current && websocket.current.readyState === WebSocket.OPEN) {
-        const payload = JSON.stringify({ audio_data: base64Audio });
-        websocket.current.send(payload);
-        console.log('Audio data sent:', payload);
-      } else {
-        console.warn('WebSocket is not open. Cannot send audio data.');
+  const processAudioFile = async (filePath, pointerId) => {
+    try {
+      const fileData = await RNFS.readFile(filePath, 'base64');
+      const data = {
+        audio_base64: fileData,
+        src: 'english',
+        dest: 'tamil',
+      };
+      const response = await audioToTextApi(data);
+      if (response?.recognized_text?.length > 0) {
+        const tword = response.recognized_text[0].tword;
+        setTranslatedText(tword); // Set the translated text
       }
     } catch (error) {
-      console.error('Error sending audio message:', error);
+      console.error(`Error processing file for pointer ${pointerId}:`, error);
     }
-  };
-
-  const cleanup = () => {
-    if (websocket.current) {
-      websocket.current.close();
-    }
-    AudioRecord.stop();
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.transcription}>Audio Recorder</Text>
-      <Button title="Start Recording" onPress={startRecording} disabled={recording} />
-      <Button title="Stop Recording" onPress={stopRecording} disabled={!recording} />
+      <ZegoUIKitPrebuiltCall
+        appID={231756352}
+        appSign={'0d8a3035128597c551008b5fb440f8e43b5b58c83c2b6f40062a1e38e5c8d3eb'}
+        userID={number}
+        userName={number}
+        callID={'uygfbbwdjcnjnissuduybe'}
+        config={{
+          ...ONE_ON_ONE_VIDEO_CALL_CONFIG,
+          onCallEnd: () => {
+            console.log('Call ended.');
+            recordingActive.current = false;
+            navigation.goBack();
+          },
+        }}
+      />
+      {translatedText ? (
+        <View style={styles.translatedTextContainer}>
+          <Text style={styles.translatedText}>{translatedText}</Text>
+        </View>
+      ) : null}
     </View>
   );
 };
 
+export default Call;
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
-    backgroundColor:'blue'
+    justifyContent: 'center',
   },
-  transcription: {
-    color:'black',
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 20,
+  translatedTextContainer: {
+    position: 'absolute',
+    bottom: 30,
+    width: '100%',
+    backgroundColor: '#0D69D7',
+    padding: 10,
+    alignItems: 'center',
+    borderRadius:10,
+  },
+  translatedText: {
+    color: 'white',
+    fontSize: 16,
+    textAlign: 'center',
   },
 });
-
-export default Call;

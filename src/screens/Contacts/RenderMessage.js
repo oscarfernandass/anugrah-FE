@@ -28,6 +28,7 @@ const RenderMessage = ({ item, senderPhoneNumber, route, playAudio, voiceplay })
             text, // Pass the actual message text
             targetlang, // Dynamically set the target language
           });
+          console.log(data);
           const response = await translateText(data);
           console.log(response?.translated_text);
           return response?.translated_text || 'Translation not available';

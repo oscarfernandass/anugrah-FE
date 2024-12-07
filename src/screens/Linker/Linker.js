@@ -12,6 +12,8 @@
     import { useRoute } from '@react-navigation/native';
     import { useFocusEffect } from '@react-navigation/native';
     import { useCallback } from 'react';
+    import { LinkPreview } from '@flyerhq/react-native-link-preview'
+    import ReceiveSharingIntent from 'react-native-receive-sharing-intent';
     const Linker = () => {
         const navigation = useNavigation();
         const route = useRoute();
@@ -20,6 +22,16 @@
         const [messages, setMessages] = useState([]);
         const [pages, setPages] = useState([]);
         const [currentPageId, setCurrentPageId] = useState(null);
+
+        useEffect(()=>{
+            setLink();
+            },[])
+            const setLink=()=>{
+                if(route?.params?.routeLink){
+                    console.log("link came in linker",route?.params?.routeLink)
+                    setInputText(route?.params?.routeLink);
+                }
+            }
     
         // Initialize app state
         const initializeApp = async () => {
@@ -130,18 +142,46 @@
             );
         };
 
+        const handleTypeClick = (type) => {
+            // Remove all messages of type 'summary', 'description', and 'signLanguage'
+            setMessages((prevMessages) => {
+                const filteredMessages = prevMessages.filter(
+                    (msg) => !['summary', 'description', 'signLanguage','loading'].includes(msg.type)
+                );
+                return [...filteredMessages];
+            });
+        
+            // Add a loading message
+            const loadingMessage = { text: 'Loading...', sender: 'assistant', type: 'loading' };
+            addMessage(loadingMessage);
+        
+            // After 1 second, replace the loading message with a result message
+            setTimeout(() => {
+                setMessages((prevMessages) => {
+                    const updatedMessages = prevMessages.filter((msg) => msg.type !== 'loading');
+                    const resultMessage = {
+                        text: `Generated ${type} successfully! 🎉`,
+                        sender: 'assistant',
+                        type: 'result',
+                    };
+                    return [...updatedMessages, resultMessage];
+                });
+            }, 1000);
+        };
+
         const renderItem = ({ item }) => {
             const sender = item.sender === 'user';
             const messageTypeStyle = {
                 description: ['#5F9EA0', '#088F8F'],
                 summary: ['#9D50BB', '#6E48AA'],
                 signLanguage: ['#FF512F', '#DD2476'],
-                entry: ['#FFD194', '#D1913C'],
             };
-    
-            if (item.type) {
+            const urlRegex = /(https?:\/\/[^\s]+)/g;
+            const containsUrl = urlRegex.test(item.text);
+        
+            if (item.type && ['summary', 'description', 'signLanguage'].includes(item.type)) {
                 return (
-                    <TouchableOpacity>
+                    <TouchableOpacity onPress={() => handleTypeClick(item.type)}>
                         <LinearGradient
                             colors={messageTypeStyle[item.type] || ['#000', '#fff']}
                             style={[styles.messageContainer, { flexDirection: 'row', borderBottomLeftRadius: 0 }]}
@@ -153,7 +193,20 @@
                     </TouchableOpacity>
                 );
             }
-    
+        
+            if (containsUrl) {
+                return (
+                    <View
+                        style={[
+                            styles.messageContainer,
+                            sender ? styles.userMessage : styles.assistantMessage,
+                        ]}
+                    >
+                        <LinkPreview text={item.text} />
+                    </View>
+                );
+            }
+        
             return (
                 <View
                     style={[
@@ -171,7 +224,9 @@
                     </Text>
                 </View>
             );
-        }
+        };
+        
+        
         
 
         return (

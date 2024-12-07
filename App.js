@@ -18,8 +18,9 @@ import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import Shake from 'react-native-shake';
 import Tts from 'react-native-tts';
 import RNImmediatePhoneCall from 'react-native-immediate-phone-call';
-
 export default function App() {
+
+
   const [isModalVisible, setModalVisible] = useState(false);
   const vibrationIntervalRef = useRef(null);
   const phoneCallTimeoutRef = useRef(null);

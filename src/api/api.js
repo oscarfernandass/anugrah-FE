@@ -48,8 +48,8 @@ export const chatBotApi = async (data) => {
 
 export const verifyOtp = async (data) => {
   try {
-    const response = await axios.post('verify-mfa',data, 
-  {
+    const response = await axios.post('auth',data, 
+    {
       headers: {
         'Content-Type': 'application/json',
       }
@@ -63,6 +63,18 @@ export const verifyOtp = async (data) => {
   }
 }
 
+export const audioToTextApi = async (data) => {
+  try {
+    console.log("??????",data);
+    const response = await axios.post('audio-to-text-base64',data
+  );
+    if(response) return response.data;
+    else return false;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+}
 export const getDoc = async (username) => {
     try {
       const response = await axios.get(`user-documents/${username}`);
@@ -73,18 +85,6 @@ export const getDoc = async (username) => {
     }
   };
  
-  export const loadGraph = async (data) => {
-    try {
-      console.log("??????",data);
-      const response = await axios.post('load-knowledge-graph',data
-    );
-      if(response) return response.data;
-      else return false;
-    } catch (error) {
-      console.log(error);
-      return false;
-    }
-  }
 
   export const getQuery = async (data) => {
     try {

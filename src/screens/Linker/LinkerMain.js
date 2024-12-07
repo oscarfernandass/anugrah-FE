@@ -7,14 +7,16 @@ import { useNavigation } from '@react-navigation/native';
 import { CardStyleInterpolators } from '@react-navigation/stack';
 import Linker from './Linker';
 import PageList from './PageList';
+import { useRoute } from '@react-navigation/native';
 const LinkerMain = () => {
   const navigation=useNavigation();
   const{logout}=useAuthContext();
+  const route=useRoute();
   return (
     <Stack.Navigator
     screenOptions={{
         cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS, // for a horizontal slide
-        gestureEnabled: true,
+        gestureEnabled: false,
         gestureDirection: 'vertical', // direction of the slide
       }}
     >
@@ -26,6 +28,7 @@ const LinkerMain = () => {
           headerTitle: '',
           headerTitleAlign: 'center',
         }}
+        initialParams={{ routeLink: route?.params?.sharedUrl }}
       />
 
       <Stack.Screen

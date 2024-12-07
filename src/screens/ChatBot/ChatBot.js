@@ -1,178 +1,220 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Keyboard, TouchableOpacity } from 'react-native';
-import { GiftedChat, Bubble, Avatar } from 'react-native-gifted-chat';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import Tts from 'react-native-tts';
-import { chatBotApi } from '../../api/api';
+import React, { useState, useRef, useEffect } from 'react';
+import { FlatList, Image, StyleSheet, Text, TextInput, TouchableOpacity, View, KeyboardAvoidingView, Platform ,PermissionsAndroid, Alert,Keyboard} from 'react-native';
+import { useRoute } from '@react-navigation/native';
+import call from '../../assets/images/call.png';
+import micer from '../../assets/images/micer.png';
+import { Buffer } from 'buffer';
+import Sound from 'react-native-sound';
+import AudioRecord from 'react-native-audio-record';
+import { Vibration } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { launchImageLibrary } from 'react-native-image-picker';
+import rob from '../../assets/images/rob.png';
 const ChatBot = () => {
-  const [messages, setMessages] = useState([]);
-  const [marginBottom, setMarginBottom] = useState(0);
-  const [voice, setVoice] = useState(false);
-  const [user, setUser] = useState({
-    _id: 1,
-    name: 'User',
-    avatar: 'https://img.freepik.com/premium-vector/3d-chat-bot-robot_685294-11.jpg',
-  });
+  const navigation=useNavigation();
+  const route=useRoute();
+  const [messages, setMessages] = useState([
+    { id: '1', text: 'Hello!', sender: true },
+    { id: '2', text: 'Hi, how can I help you?', sender: false },
+  ]);
+  const [inputText, setInputText] = useState('');
+  const [recording, setRecording] = useState(false);
+  const [imagesend,setImageSend] = useState('');
+  const flatListRef = useRef();
+
+  const selectImage = () => {
+    const options = {
+      mediaType: 'photo',
+      maxWidth: 300,
+      maxHeight: 550,
+      quality: 1,
+      includeBase64: true,
+    };
+  
+    launchImageLibrary(options, (response) => {
+      if (response.didCancel) {
+        Alert.alert('User cancelled image picker');
+        return;
+      } else if (response.errorCode) {
+        Alert.alert('Image Picker Error:', response.errorMessage);
+        return;
+      }
+  
+      if (response.assets && response.assets.length > 0) {
+        console.log("Image", response.assets[0]);
+        setImageSend(response.assets[0]); // Assuming `setProfileImage` updates your state
+      }
+    });
+  };
 
   useEffect(() => {
-    const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
-      setMarginBottom(-60);
-    });
-    const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
-      setMarginBottom(0);
-    });
+      requestAudioPermission();
+      initAudioRecord();
+    }, []);
 
-    return () => {
-      keyboardDidShowListener.remove();
-      keyboardDidHideListener.remove();
+
+const requestAudioPermission = async () => {
+    const granted = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.RECORD_AUDIO);
+    if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
+        console.log('Record audio permission denied');
+    }
+};
+
+const initAudioRecord = () => {
+    const options = {
+        sampleRate: 16000,
+        channels: 1,
+        bitsPerSample: 16,
+        wavFile: 'test.wav',
     };
-  }, []);
+    AudioRecord.init(options);
+};
 
-  const onSend = async (newMessages = []) => {
-    const updatedMessages = GiftedChat.append(messages, newMessages);
-    setMessages(updatedMessages);
-    await AsyncStorage.setItem('groupMessages', JSON.stringify(updatedMessages));
-
-    const userMessage = newMessages[0]?.text;
-    const data = { text: userMessage };
-
-    try {
-      const response = await chatBotApi(data);
-      if (response?.response) {
-        if (voice) {
-          Speak(response.response);
-        }
-
-        const botMessage = {
-          _id: Math.random().toString(),
-          text: response.response,
-          createdAt: new Date(),
-          user: {
-            _id: 2,
-            name: 'ChatBot',
-            avatar: 'https://img.freepik.com/premium-vector/3d-chat-bot-robot_685294-11.jpg',
-          },
-        };
-
-        const updatedMessagesWithBot = GiftedChat.append(updatedMessages, [botMessage]);
-        setMessages(updatedMessagesWithBot);
-        await AsyncStorage.setItem('groupMessages', JSON.stringify(updatedMessagesWithBot));
-      }
-    } catch (error) {
-      console.error('Error sending message to chatbot:', error);
+  const sendTextMessage = () => {
+    if (inputText.trim()) {
+      setMessages([...messages, { id: Date.now().toString(), text: inputText, sender: true }]);
+      setInputText('');
     }
   };
 
-  useEffect(() => {
-    const loadMessages = async () => {
-      const storedMessages = await AsyncStorage.getItem('groupMessages');
-      if (storedMessages) {
-        setMessages(JSON.parse(storedMessages));
-      }
-    };
 
-    loadMessages();
-  }, []);
-
-  const Speak = async (text) => {
-    await Tts.setDefaultVoice('en-us-x-tpf-local');
-    Tts.speak(text, {
-      androidParams: {
-        KEY_PARAM_PAN: -1,
-        KEY_PARAM_VOLUME: 0.5,
-        KEY_PARAM_STREAM: 'STREAM_MUSIC',
-      },
-    });
-  };
-
-  const renderAvatar = (props) => {
-    return (
-      <Avatar
-        {...props}
-        imageStyle={{
-          left: { width: 36, height: 36, borderRadius: 18 },
-          right: { width: 36, height: 36, borderRadius: 18 },
-        }}
-      />
-    );
-  };
-
-  const renderBubble = (props) => {
-    const isBotMessage = props.currentMessage.user._id === 2;
-
-    return (
-      <TouchableOpacity
-        onPress={() => {
-          if (isBotMessage && voice) {
-            Speak(props.currentMessage.text);
-          }
-        }}
-        style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}
-      >
-        <Bubble
-          {...props}
-          wrapperStyle={{
-            left: { backgroundColor: 'lightgray' },
-            right: { backgroundColor: '#0D69D7' },
-          }}
+  const renderMessage = ({ item }) => (
+    <View style={[styles.messageContainer, item.sender ? styles.senderContainer : styles.receiverContainer]}>
+      {
+        item.sender===false &&
+        <Image
+        source={rob}
+        style={[styles.avatar,{marginLeft:item.sender?4:0, marginRight:item.sender?0:4}]}
         />
-      </TouchableOpacity>
-    );
-  };
+      }
+            {item.text ? (
+      <Text style={[styles.messageText, item.sender ? styles.senderText : styles.receiverText]}>
+        {item.text}
+      </Text>
+      ):null}
+    </View>
+  );
 
   return (
-    <View style={{ flexGrow: 1, marginBottom: marginBottom }}>
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Text style={[styles.header, styles.font]}>
-          Chat <Text style={styles.blueText}>Bot</Text>
-        </Text>
-        <TouchableOpacity
-          style={{ justifyContent: 'center', alignItems: 'center' }}
-          onPress={() => {
-            setVoice(!voice);
-            Tts.stop();
-          }}
-        >
-          <Text style={[styles.voiceStatus, styles.font, { color: voice ? '#0D69D7' : 'red' }]}>
-            {voice ? 'Voice Enabled' : 'Voice Disabled'}
-          </Text>
+    <KeyboardAvoidingView style={[styles.container]} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+      <FlatList
+        ref={flatListRef}
+        data={messages}
+        renderItem={renderMessage}
+        keyExtractor={(item) => item.id}
+        contentContainerStyle={styles.messageList}
+        onContentSizeChange={() => flatListRef.current.scrollToEnd({ animated: true })}
+      />
+      <View style={[styles.inputContainer,
+        ]}>
+        <TextInput
+          style={styles.input}
+          value={inputText}
+          onChangeText={setInputText}
+          placeholder="Type a message..."
+          placeholderTextColor="gray"
+        />
+        <TouchableOpacity style={{justifyContent:'center',alignItems:'center',backgroundColor:'#0D69D7',padding:10,borderRadius:50}}>
+                <Image source={micer} style={{ width: 20, height: 20 }} />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={sendTextMessage} style={styles.sendButton}>
+          <Text style={styles.sendButtonText}>Send</Text>
         </TouchableOpacity>
       </View>
-      <GiftedChat
-        textInputProps={{
-          style: { color: 'black', width: '80%' },
-        }}
-        messages={messages}
-        onSend={onSend}
-        user={user}
-        renderBubble={renderBubble}
-        renderAvatar={renderAvatar}
-      />
-    </View>
+    </KeyboardAvoidingView>
   );
 };
 
 export default ChatBot;
 
 const styles = StyleSheet.create({
-  blueText: {
-    color: '#0D69D7',
-    fontSize: 22,
-  },
-  font: {
-    fontFamily: 'Helvetica Neue',
+  container: {
+    flex: 1,
+    backgroundColor: '#F8F8F8',
   },
   header: {
-    fontSize: 22,
-    color: 'black',
-    fontWeight: '600',
-    letterSpacing: 0.2,
-    paddingLeft: 20,
-    paddingTop: 10,
+      flexDirection:'row',
+    height: 53,
+    backgroundColor: '#0D69D7',
+    justifyContent:'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 1,
+    shadowRadius: 4,
+    // Shadow properties for Android
+    elevation: 5,
   },
-  voiceStatus: {
-    fontSize: 12,
-    paddingRight: 20,
-    fontWeight: '700',
+  headerText: {
+    fontSize: 18,
+    color: 'white',
+    fontWeight: 'bold',
+    marginLeft:5,
+  },
+  messageList: {
+    flexGrow: 1,
+    padding: 16,
+  },
+  messageContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  senderContainer: {
+    alignSelf: 'flex-end',
+    flexDirection: 'row-reverse',
+  },
+  receiverContainer: {
+    alignSelf: 'flex-start',
+  },
+  avatar: {
+    width: 25,
+    height: 25,
+    borderRadius: 50,
+    // marginHorizontal: 5,
+    alignSelf:'flex-end'
+  },
+  messageText: {
+    maxWidth: '70%',
+    padding: 10,
+    borderRadius: 50,
+    fontSize: 16,
+  },
+  senderText: {
+    backgroundColor: '#0D69D7',
+    color: 'white',
+  },
+  receiverText: {
+    backgroundColor: '#E5E5EA',
+    color: 'black',
+  },
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent:'space-evenly',
+    gap:5,
+    padding: 10,
+    borderTopWidth: 1,
+    borderColor: '#ddd',
+    backgroundColor: 'white',
+  },
+  input: {
+    flex: 1,
+    fontSize: 16,
+    padding: 10,
+    borderRadius: 20,
+    backgroundColor: '#F1F1F1',
+    // marginRight: 10,
+  },
+  sendButton: {
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    backgroundColor: '#0D69D7',
+    borderRadius: 20,
+  },
+  sendButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
   },
 });

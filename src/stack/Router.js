@@ -1,27 +1,46 @@
+import React, { useEffect, useState } from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import React, { useEffect, useState } from 'react'
-import { useLoadJWT } from '../utility/loadJWT'
-import Spinner from '../components/Spinner.js';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useLoadJWT } from '../utility/loadJWT';
 import { useAuthContext } from '../hooks/Context';
+import Spinner from '../components/Spinner.js';
 import Notification from '../screens/Notification/Notification.js';
 import DrawerRoute from './DrawerRoute.tsx';
 import Onboarding from '../screens/Onboarding/Onboarding.tsx';
-import { Login } from '../screens/Onboarding.js';
 import { Register } from '../screens/Register';
 import Qr from '../screens/Qr.js';
-import Mfa from '../screens/Mfa.js';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-// import Contacts from '../screens/Contacts/Contacts.js';
 import ContactMain from '../screens/Contacts/ContactMain.js';
+import Otp from '../screens/Otp.js';
+import Login from '../screens/Onboarding.js';
+import LinkerMain from '../screens/Linker/LinkerMain.js';
+import ReceiveSharingIntent from 'react-native-receive-sharing-intent';
+
 const Stack = createNativeStackNavigator();
 
 const Router = () => {
-    const { authState } = useAuthContext()
-    const [loadJWT, status] = useLoadJWT()
-    const [authenticated, setAuthenticated] = useState('')
-    const [loading, setLoading] = useState(true);
 
-    // Refactor the useEffect to handle async properly
+  ReceiveSharingIntent.getReceivedFiles(files => {
+    console.log(files);
+    setSharedUrl(files[0]?.weblink);
+    // files returns as JSON Array example
+    //[{ filePath: null, text: null, weblink: null, mimeType: null, contentUri: null, fileName: null, extension: null }]
+  }, 
+  (error) =>{
+    console.log(error);
+  }, 
+  'ShareMedia' // share url protocol (must be unique to your app, suggest using your apple bundle id)
+  );
+  
+  
+  // To clear Intents
+  ReceiveSharingIntent.clearReceivedFiles();
+
+    const { authState } = useAuthContext();
+    const [loadJWT, status] = useLoadJWT();
+    const [authenticated, setAuthenticated] = useState('');
+    const [loading, setLoading] = useState(true);
+    const [sharedUrl, setSharedUrl] = useState(null);
+
     useEffect(() => {
         const fetchLoginStatus = async () => {
             try {
@@ -30,43 +49,46 @@ const Router = () => {
             } catch (error) {
                 console.error("Error fetching login status", error);
             } finally {
-                setLoading(false); // Ensure loading state is handled
+                setLoading(false);
             }
         };
 
-        fetchLoginStatus();
+        // Handle shared URL from ReceiveSharingIntent
 
-        // Optionally, you can return a cleanup function if required
-        return () => {
-            // Cleanup code, if needed
-        };
-    }, []);  // Empty dependency array means this runs only on mount
+        fetchLoginStatus();
+    }, []);
 
     if (loading) {
-        return <Spinner />
+        return <Spinner />;
     }
 
-    if (authenticated === 'true') {
-        return (
-            <Stack.Navigator initialRouteName={'Home'} screenOptions={{ headerShown: false }}>
-                <Stack.Screen name='Home' component={DrawerRoute} options={{ headerShown: false }} />
-                <Stack.Screen name='Notification' component={Notification} options={{ headerShown: false }} />
-            </Stack.Navigator>
-        );
-    }
+    // Determine the initial route based on shared URL
+    const initialRoute = sharedUrl
+        ? 'LinkerMain'
+        : authenticated === 'true'
+        ? 'Home'
+        : 'Onboarding';
 
     return (
-        <Stack.Navigator initialRouteName={'Onboarding'} screenOptions={{ headerShown: false }}>
-            <Stack.Screen name='ContactMain' component={ContactMain} options={{ headerShown: false }} />
-            <Stack.Screen name='Onboarding' component={Onboarding} options={{ headerShown: false }} />
-            <Stack.Screen name='LoginScreen' component={Login} options={{ headerShown: false }} />
-            <Stack.Screen name='Register' component={Register} options={{ headerShown: false }} />
-            <Stack.Screen name='Qr' component={Qr} options={{ headerShown: false }} />
-            <Stack.Screen name='Mfa' component={Mfa} options={{ headerShown: false }} />
-            <Stack.Screen name='Home' component={DrawerRoute} options={{ headerShown: false }} />
-            <Stack.Screen name='Notification' component={Notification} options={{ headerShown: false }} />
+        <Stack.Navigator initialRouteName={initialRoute} screenOptions={{ headerShown: false }}>
+            {/* Shared URL route */}
+            <Stack.Screen
+                name='LinkerMain'
+                component={LinkerMain}
+                initialParams={{ sharedUrl }}
+            />
+            {/* Authenticated routes */}
+            <Stack.Screen name='Home' component={DrawerRoute} />
+            <Stack.Screen name='Notification' component={Notification} />
+            {/* Unauthenticated routes */}
+            <Stack.Screen name='ContactMain' component={ContactMain} />
+            <Stack.Screen name='Onboarding' component={Onboarding} />
+            <Stack.Screen name='LoginScreen' component={Login} />
+            <Stack.Screen name='Register' component={Register} />
+            <Stack.Screen name='Qr' component={Qr} />
+            <Stack.Screen name='Otp' component={Otp} />
         </Stack.Navigator>
     );
-}
+};
 
 export default Router;
