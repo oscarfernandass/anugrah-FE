@@ -20,21 +20,11 @@ export const translateText = async (data) => {
 
 export const chatBotApi = async (data) => {
   try {
-    // Create a new FormData instance
-    const formData = new FormData();
-    // Append data to the FormData instance
-    formData.append('text', data.text);
-    if (data.image) {
-      formData.append('image', {
-        uri: data.image.uri,
-        type: data.image.type,
-        name: data.image.name,
-      });
-    }
     // Send the request with FormData
-    const response = await axios.post('chatbot', formData, {
+    console.log("form data???",JSON.stringify(data))
+    const response = await axios.post('chatbot', data, {
       headers: {
-        'Content-Type': 'multipart/form-data',
+        'Content-Type': 'application/json',
       },
     });
     if (response) return response.data;

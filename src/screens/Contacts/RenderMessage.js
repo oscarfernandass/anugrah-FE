@@ -179,7 +179,7 @@ const styles = StyleSheet.create({
   messageText: {
     maxWidth: '70%',
     padding: 10,
-    borderRadius: 50,
+    borderRadius: 10,
     fontSize: 16,
   },
   senderText: {

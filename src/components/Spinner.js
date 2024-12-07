@@ -21,11 +21,11 @@ const Spinner = () => {
 
   return (
     <View style={styles.container}>
-        <Image source={snipe} style={{ height: 120, width: 120 }} />
-      <Animated.View style={animatedStyle}>
-        <Text style={[{ color: 'white', fontSize: 20 }, styles.font]}>Anugrah</Text>
-      </Animated.View>
-      <ActivityIndicator style={{marginTop:20}} size={'large'} color={'white'} />
+      {/* <Animated.View style={animatedStyle}> */}
+        <Image source={snipe} style={{ height: 160, width: 160 ,borderColor:'white', borderWidth:2, borderRadius:8 }} />
+      {/* </Animated.View> */}
+        <Text style={[{ color: 'white', fontSize: 16 }, styles.font]}>Anugrah</Text>
+      <ActivityIndicator style={{marginTop:20}} size={30} color={'white'} />
     </View>
   );
 };
@@ -36,7 +36,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#0D69D7',
-    gap:20
+    gap:10
   },
   font: {
     fontFamily: 'Helvetica Neue',
