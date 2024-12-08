@@ -41,11 +41,14 @@ const Call = () => {
 
   const initAudioRecord = () => {
     const options = {
-      sampleRate: 16000,
-      channels: 1,
-      bitsPerSample: 16,
-      wavFile: `call_audio.wav`,
+      sampleRate: 16000,  // The sample rate of the audio
+      channels: 1,        // Mono channel for microphone
+      bitsPerSample: 16,  // Bits per sample
+      wavFile: 'call_audio.wav',  // Output file path
+      audioSource: 1,     // Audio source set to MIC (1 for default microphone)
     };
+  
+    // Initialize the audio record with the given options
     AudioRecord.init(options);
   };
 

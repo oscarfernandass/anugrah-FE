@@ -9,6 +9,7 @@ import rob from '../../assets/images/rob.png';
 import attach from '../../assets/images/attach.png';
 import send from '../../assets/images/send.png';
 import { chatBotApi } from '../../api/api';
+import MessageItem from './MessageItem';
 
 const ChatBot = () => {
   const navigation=useNavigation();
@@ -115,53 +116,11 @@ const sendTextOrImageMessage = async () => {
   }
 };
 
-
-
-
-  const renderMessage = ({ item }) => (
-    <View style={[styles.messageContainer, item.sender ? styles.senderContainer : styles.receiverContainer]}>
-      {
-        item.sender===false &&
-        <Image
-        source={rob}
-        style={[styles.avatar,{marginLeft:item.sender?0:0, marginRight:item.sender?0:4}]}
-        />
-      }
-      {item.image ? (
-          <View style={[styles.imageMessage,{backgroundColor:item?.sender?'#0D69D7':'#E5E5EA'}]}>
-            <Image
-              source={{ uri: item.image}}
-              style={styles.messageImage}
-            />
-            {item.text && (
-                  <Text
-                    style={[
-                      // styles.messageText,
-                      { color: item?.sender ? 'white' : 'black',padding:5,width:150 },
-                    ]}
-                  >
-                    {item.text}
-                  </Text>
-            )}
-          </View>
-        ) : (
-            <Text
-              style={[
-                styles.messageText,
-                item?.sender ? styles.senderText : styles.receiverText,
-              ]}
-            >
-              {item.text}
-            </Text>
-        )}
-    </View>
-  );
-
   return (
     <KeyboardAvoidingView style={[styles.container]} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <FlatList
         data={[...messages].reverse()}
-        renderItem={renderMessage}
+        renderItem={({ item }) => <MessageItem item={item} />}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.messageList}
         inverted

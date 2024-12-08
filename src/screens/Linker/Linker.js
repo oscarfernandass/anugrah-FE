@@ -14,6 +14,7 @@
     import { useCallback } from 'react';
     import { LinkPreview } from '@flyerhq/react-native-link-preview'
     import ReceiveSharingIntent from 'react-native-receive-sharing-intent';
+    import { linkToDes } from '../../api/api';
     const Linker = () => {
         const navigation = useNavigation();
         const route = useRoute();
@@ -142,11 +143,11 @@
             );
         };
 
-        const handleTypeClick = (type) => {
-            // Remove all messages of type 'summary', 'description', and 'signLanguage'
+        const handleTypeClick = async (type) => {
+            // Clear existing messages of specific types
             setMessages((prevMessages) => {
                 const filteredMessages = prevMessages.filter(
-                    (msg) => !['summary', 'description', 'signLanguage','loading'].includes(msg.type)
+                    (msg) => !['summary', 'description', 'signLanguage', 'loading'].includes(msg.type)
                 );
                 return [...filteredMessages];
             });
@@ -154,20 +155,56 @@
             // Add a loading message
             const loadingMessage = { text: 'Loading...', sender: 'assistant', type: 'loading' };
             addMessage(loadingMessage);
+
+            const lastUserMessage = [...messages].reverse().find((msg) => msg.sender === 'user');
+            if (!lastUserMessage) {
+                Alert.alert('No user message found to process.');
+                return;
+            }
         
-            // After 1 second, replace the loading message with a result message
-            setTimeout(() => {
+            try {
+                // Prepare the data payload for the API
+                const data = {
+                    url: lastUserMessage.text, // Assuming inputText contains the URL
+                    src: 'english', // Replace with actual source information if needed
+                    dest: 'tamil', // Replace with actual description info if needed
+                };
+        
+                // Call the API
+                const filePath = await linkToDes(data);
+
+                if (filePath) {
+                  console.log('Downloaded file path:', filePath);
+                } else {
+                  console.log('File download failed.');
+                }
+                // console.log(re);
+        
+                // Update messages with the API result
+                // setMessages((prevMessages) => {
+                //     const updatedMessages = prevMessages.filter((msg) => msg.type !== 'loading');
+                //     const resultMessage = {
+                //         text: response ? response : `Failed to generate ${type}.`,
+                //         sender: 'assistant',
+                //         type: 'result',
+                //     };
+                //     return [...updatedMessages, resultMessage];
+                // });
+            } catch (error) {
+                // Handle errors
+                console.error('Error while fetching description:', error);
                 setMessages((prevMessages) => {
                     const updatedMessages = prevMessages.filter((msg) => msg.type !== 'loading');
-                    const resultMessage = {
-                        text: `Generated ${type} successfully! 🎉`,
+                    const errorMessage = {
+                        text: `Error: Unable to generate ${type}.`,
                         sender: 'assistant',
-                        type: 'result',
+                        type: 'error',
                     };
-                    return [...updatedMessages, resultMessage];
+                    return [...updatedMessages, errorMessage];
                 });
-            }, 1000);
+            }
         };
+        
 
         const renderItem = ({ item }) => {
             const sender = item.sender === 'user';

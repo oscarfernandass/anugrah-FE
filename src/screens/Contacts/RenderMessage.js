@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import {
   View,
   Text,
@@ -7,46 +7,60 @@ import {
   TouchableOpacity,
   Modal,
   TouchableWithoutFeedback,
-  Vibration
+  Vibration,
 } from 'react-native';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { translateText } from '../../api/api';
-import LottieView from 'lottie-react-native';
 
 const RenderMessage = ({ item, senderPhoneNumber, route, playAudio, voiceplay }) => {
-    const [isModalVisible, setIsModalVisible] = useState(false);
-    const isSender = item.sender === senderPhoneNumber;
-    const [translatedText, setTranslatedText] = useState("");
-    const [loading, setLoading] = useState(false);
-    const getTranslatedText = async (text) => {
-        setLoading(true);
-        try {
-          // Fetch the target language from AsyncStorage
-          const targetlang = (await AsyncStorage.getItem('selectedLanguage')) || 'english'; // Default to English
-          const data = JSON.stringify({
-            text, // Pass the actual message text
-            targetlang, // Dynamically set the target language
-          });
-          console.log(data);
-          const response = await translateText(data);
-          console.log(response?.translated_text);
-          return response?.translated_text || 'Translation not available';
-        } catch (error) {
-          console.error('Translation failed:', error);
-          return 'Translation error';
-        } finally {
-            setLoading(false);
-        }
-      };
-      
-      const handleLongPress = async () => {
-        const translated = await getTranslatedText(item.text); // Pass item.text for translation
-        setTranslatedText(translated); // Update the translated text state
-        Vibration.vibrate(300);
-        setIsModalVisible(true);
-      };
-      
+  useEffect(() => {
+    if (item.text) {
+      (async () => {
+        const translated = await getTranslatedText(item.text);
+        setTranslatedText(translated);
+      })();
+    }
+  }, [item.text]);
+  
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const isSender = item.sender === senderPhoneNumber;
+  const [translatedText, setTranslatedText] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [lastTap, setLastTap] = useState(null);
+
+  const getTranslatedText = async (text) => {
+    setLoading(true);
+    try {
+      const targetlang = (await AsyncStorage.getItem('selectedLanguage')) || 'english';
+      const data = JSON.stringify({ text, targetlang });
+      const response = await translateText(data);
+      return response?.translated_text || 'Translation not available';
+    } catch (error) {
+      console.error('Translation failed:', error);
+      return 'Translation error';
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDoubleTap = () => {
+    const now = Date.now();
+    if (lastTap && now - lastTap < 300) {
+      setLastTap(null);
+      setIsModalVisible(true); // Show modal immediately
+      setLoading(true); // Show loading animation
+      Vibration.vibrate(200);
+      getTranslatedText(item.text).then((translated) => {
+        setTranslatedText(translated);
+        setLoading(false);
+      });
+    } else {
+      setLastTap(now);
+    }
+  };
+  
+
   const handleCloseModal = () => setIsModalVisible(false);
 
   return (
@@ -71,13 +85,18 @@ const RenderMessage = ({ item, senderPhoneNumber, route, playAudio, voiceplay })
           ]}
         />
         {item.base64Image ? (
-          <View style={[styles.imageMessage,{backgroundColor:isSender?'#0D69D7':'#E5E5EA'}]}>
+          <View
+            style={[
+              styles.imageMessage,
+              { backgroundColor: isSender ? '#0D69D7' : '#E5E5EA' },
+            ]}
+          >
             <Image
               source={{ uri: `data:image/webp;base64,${item.base64Image}` }}
               style={styles.messageImage}
             />
             {item.text && (
-              <TouchableWithoutFeedback onPressIn={handleLongPress} onPressOut={handleCloseModal}>
+              <TouchableWithoutFeedback onPress={handleDoubleTap}>
                 <Animated.View entering={FadeIn} exiting={FadeOut}>
                   <Text
                     style={[
@@ -100,7 +119,7 @@ const RenderMessage = ({ item, senderPhoneNumber, route, playAudio, voiceplay })
             />
           </TouchableOpacity>
         ) : (
-          <TouchableWithoutFeedback onPressIn={handleLongPress} onPressOut={handleCloseModal}>
+          <TouchableWithoutFeedback onPress={handleDoubleTap}>
             <Text
               style={[
                 styles.messageText,
@@ -112,52 +131,47 @@ const RenderMessage = ({ item, senderPhoneNumber, route, playAudio, voiceplay })
           </TouchableWithoutFeedback>
         )}
       </View>
-      <Modal
-        visible={isModalVisible}
-        transparent={true}
-        animationType="fade"
-        >
-        <View style={styles.modalBackground}>
-            <View style={styles.modalContent}>
-            <Text
-                style={[
-                { fontSize: 18, color: 'black', fontWeight: '500', letterSpacing: 0.2 },
-                styles.font,
-                ]}
-            >
-                Magic <Text style={styles.blueText}>Touch</Text>
-            </Text>
-            {
-                loading ? (
-                            <View>
-                                <LottieView source={require('../../assets/lottie/loading.json')} autoPlay loop style={{ height: 80, width: 80, alignSelf: 'center' }} />
-                                <Text style={[{ fontSize: 8, color: 'black', fontWeight: '400', letterSpacing: 0.2, alignSelf: 'center', marginTop: -110 }, styles.font]}>translating...</Text>
-                            </View>
-                        ) : (
-            <Text
-                style={{
-                marginTop: 10,
-                fontSize: 16,
-                color: 'black',
-                textAlign: 'center',
-                }}
-            >
-                {translatedText}
-            </Text>
-                        )
-            }
-            </View>
-        </View>
-        </Modal>
-
+      <Modal visible={isModalVisible} transparent={true} animationType="fade">
+        <TouchableWithoutFeedback onPress={handleCloseModal}>
+          <View style={styles.modalBackground}>
+            <TouchableWithoutFeedback>
+              <View style={styles.modalContent}>
+                <Text
+                  style={[
+                    {
+                      fontSize: 18,
+                      color: 'black',
+                      fontWeight: '500',
+                      letterSpacing: 0.2,
+                    },
+                    styles.font,
+                  ]}
+                >
+                  Magic <Text style={styles.blueText}>Tap</Text>
+                </Text>
+                  <Text
+                    style={{
+                      marginTop: 10,
+                      fontSize: 16,
+                      color: 'black',
+                      textAlign: 'center',
+                    }}
+                  >
+                    {translatedText}
+                  </Text>
+              </View>
+            </TouchableWithoutFeedback>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
     </>
   );
 };
 
 const styles = StyleSheet.create({
-    font:{
-        fontFamily: 'Helvetica Neue',
-      },
+  font: {
+    fontFamily: 'Helvetica Neue',
+  },
   messageContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -191,8 +205,6 @@ const styles = StyleSheet.create({
     color: 'black',
   },
   imageMessage: {
-    // alignItems: 'center',
-    // backgroundColor: '#E5E5EA',
     padding: 4,
     borderRadius: 10,
   },
@@ -212,21 +224,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   modalContent: {
-    top:60,
     width: '75%',
     padding: 20,
+    top:60,
     backgroundColor: 'white',
     borderRadius: 10,
     alignItems: 'center',
   },
-  modalText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: 'black',
-  },
   blueText: {
     color: '#0D69D7',
-    fontSize:19
+    fontSize: 19,
   },
 });
 
