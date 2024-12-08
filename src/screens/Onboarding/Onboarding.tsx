@@ -70,7 +70,7 @@ export default function Onboarding() {
         </View>
         {/* Text Container */}
         <View style={styles.fillCenter}>
-          <Text style={styles.text}>CtrlShiftGeek</Text>
+          <Text style={styles.text}>CYKLONES</Text>
         </View>
         {/* iconContainer */}
         <View style={styles.fillCenter}>
