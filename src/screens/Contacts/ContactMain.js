@@ -9,6 +9,7 @@ import ContactChat from './ContactChat';
 import { CardStyleInterpolators } from '@react-navigation/stack';
 import Call from './Call';
 import NewChat from './NewChat';
+import AudioCall from './AudioCall';
 const ContactMain = () => {
   const navigation=useNavigation();
   const{logout}=useAuthContext();
@@ -41,6 +42,15 @@ const ContactMain = () => {
       <Stack.Screen
         name="Call"
         component={Call}
+        options={{
+          headerShown: false,
+          headerTitle: '',
+          headerTitleAlign: 'center',
+        }}
+      />
+      <Stack.Screen
+        name="AudioCall"
+        component={AudioCall}
         options={{
           headerShown: false,
           headerTitle: '',

@@ -23,6 +23,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import video from '../../assets/images/video.png';
 import RenderMessage from './RenderMessage';
 import back from '../../assets/images/back.jpg';
+import AudioCall from './AudioCall';
 const ContactChat = () => {
   const navigation=useNavigation();
   const route=useRoute();
@@ -31,6 +32,7 @@ const ContactChat = () => {
   const [recording, setRecording] = useState(false);
   const [imagesend,setImageSend] = useState('');
   const [senderPhoneNumber, setSenderPhoneNumber] = useState('');
+  const [audioVisible,setAudioVisible]=useState(false);
   const flex = route?.params?.number?.trim()?.replace(/^\+91/, ''); // Remove "+91" if present
   const userPhoneNumber = flex?.replace(/\s+/g, '').trim();
   useFocusEffect(
@@ -104,27 +106,7 @@ const ContactChat = () => {
   
 
   const makePhoneCall = async () => {
-    try {
-      const granted = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.CALL_PHONE,
-        {
-          title: 'Phone Call Permission',
-          message: 'This app needs access to make phone calls.',
-          buttonNeutral: 'Ask Me Later',
-          buttonNegative: 'Cancel',
-          buttonPositive: 'OK',
-        }
-      );
-  
-      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-        console.log(route?.params?.number);
-        RNImmediatePhoneCall.immediatePhoneCall('+918098167783');
-      } else {
-        Alert.alert('Permission Denied', 'Cannot make a phone call without permission.');
-      }
-    } catch (err) {
-      console.warn(err);
-    }
+    setAudioVisible(true);
   };
 
 
@@ -263,6 +245,34 @@ const playAudio = async (base64Audio) => {
     console.error('Error playing audio:', error);
   }
 };
+
+
+const handleTextReceived =async (text) => {
+  if (text) {
+    const newMessage = {
+      text: text,
+      base64Image: null, // Store the base64 string
+      sender: senderPhoneNumber,
+      receiver: userPhoneNumber,
+      timestamp: serverTimestamp(),
+    };
+
+    try {
+      const chatPath = [senderPhoneNumber, userPhoneNumber].sort().join('_');
+      await addDoc(collection(database, 'chats', chatPath, 'messages'), newMessage);
+      console.log('Message sent successfully!');
+    } catch (error) {
+      console.error('Error sending message:', error);
+    }
+  }
+};
+
+const handleEndCall = () => {
+  console.log('Call ended');
+  setAudioVisible(false);
+  // Handle call end here (e.g., navigate back)
+};
+
   return (
     <KeyboardAvoidingView style={[styles.container]} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
     <ImageBackground  source={back} style={styles.container}>
@@ -281,15 +291,26 @@ const playAudio = async (base64Audio) => {
         </Text>
 
         </View>
-        <TouchableOpacity onPress={makePhoneCall} style={{marginRight:0}}>
+        {!audioVisible&&(
+          <TouchableOpacity onPress={makePhoneCall} style={{marginRight:0}}>
         <Image source={call} style={{width:18,height:18}}/>
         </TouchableOpacity>
-        <TouchableOpacity onPress={()=>{
-              navigation.navigate('Call',{number:userPhoneNumber})
-            }} style={{marginRight:5}}>
+        )}
+        {!audioVisible&&(
+          <TouchableOpacity onPress={()=>{
+            navigation.navigate('Call',{number:userPhoneNumber})
+          }} style={{marginRight:5}}>
         <Image tintColor={'white'} source={video} style={{width:25,height:25}}/>
         </TouchableOpacity>
+            )}
       </View>
+      {
+        audioVisible && (
+      <View>
+        <AudioCall onTextReceived={handleTextReceived} onEndCall={handleEndCall} />
+      </View> 
+        )
+      }
       <FlatList
         ref={flatListRef}
         data={[...messages].reverse()}

@@ -1,19 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { StyleSheet, View, Alert, PermissionsAndroid, Text } from 'react-native';
 import { ZegoUIKitPrebuiltCall, ONE_ON_ONE_VIDEO_CALL_CONFIG } from '@zegocloud/zego-uikit-prebuilt-call-rn';
-import { useRoute, useNavigation } from '@react-navigation/native';
 import AudioRecord from 'react-native-audio-record';
 import RNFS from 'react-native-fs';
 import { audioToTextApi } from '../../api/api';
-import { useRef } from 'react';
-const Call = () => {
-  
-  const route = useRoute();
-  const navigation = useNavigation();
-  const number = route?.params?.number;
+import { ZegoLayoutMode } from '@zegocloud/zego-uikit-rn';
+
+const AudioCall = ({ onTextReceived, onEndCall }) => {
   const recordingActive = useRef(true);
   const [pointerIndex, setPointerIndex] = useState(0);
-  const [translatedText, setTranslatedText] = useState(''); // For displaying `tword`
+  const [translatedText, setTranslatedText] = useState('');
 
   useEffect(() => {
     const initializeCall = async () => {
@@ -42,14 +38,12 @@ const Call = () => {
 
   const initAudioRecord = () => {
     const options = {
-      sampleRate: 16000,  // The sample rate of the audio
-      channels: 1,        // Mono channel for microphone
-      bitsPerSample: 16,  // Bits per sample
-      wavFile: 'call_audio.wav',  // Output file path
-      audioSource: 1,     // Audio source set to MIC (1 for default microphone)
+      sampleRate: 16000,
+      channels: 1,
+      bitsPerSample: 16,
+      wavFile: 'call_audio.wav',
+      audioSource: 1,
     };
-  
-    // Initialize the audio record with the given options
     AudioRecord.init(options);
   };
 
@@ -80,7 +74,10 @@ const Call = () => {
       const response = await audioToTextApi(data);
       if (response?.recognized_text?.length > 0) {
         const tword = response.recognized_text[0].tword;
-        setTranslatedText(tword); // Set the translated text
+        setTranslatedText(tword);
+        if (onTextReceived) {
+          onTextReceived(tword); // Pass the text to the parent
+        }
       }
     } catch (error) {
       console.error(`Error processing file for pointer ${pointerId}:`, error);
@@ -92,47 +89,78 @@ const Call = () => {
       <ZegoUIKitPrebuiltCall
         appID={231756352}
         appSign={'0d8a3035128597c551008b5fb440f8e43b5b58c83c2b6f40062a1e38e5c8d3eb'}
-        userID={number}
-        userName={number}
+        userID={''}
+        userName={''}
         callID={'uygfbbwdjcnjnissuduybe'}
         config={{
           ...ONE_ON_ONE_VIDEO_CALL_CONFIG,
           onCallEnd: () => {
             console.log('Call ended.');
-            recordingActive.current = false;
-            navigation.goBack();
+            onEndCall();
+          },
+          turnOnCameraWhenJoining: false,
+          turnOnMicrophoneWhenJoining: true,
+          useSpeakerWhenJoining: true,
+          // onOnlySelfInRoom: () => ,
+ 
+          layout: {
+            mode: ZegoLayoutMode.pictureInPicture,
+            config: {
+              smallViewBackgroundColor: 'transparent',
+              largeViewBackgroundColor: 'transparent',
+            },
           },
         }}
       />
-      {translatedText ? (
+      {/* {translatedText ? (
         <View style={styles.translatedTextContainer}>
           <Text style={styles.translatedText}>{translatedText}</Text>
         </View>
-      ) : null}
+      ) : null} */}
     </View>
   );
 };
 
-export default Call;
+export default AudioCall;
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  translatedTextContainer: {
-    position: 'absolute',
-    bottom: 30,
-    width: '100%',
-    backgroundColor: '#0D69D7',
-    padding: 10,
-    alignItems: 'center',
-    borderRadius:10,
-  },
-  translatedText: {
-    color: 'white',
-    fontSize: 16,
-    textAlign: 'center',
-  },
+    container:{
+        flex:1,
+        justifyContent:'center',
+        alignItems:'center',
+        height:50,
+        width:50,
+        left:'45%',
+        position:'absolute',
+        top:50,
+        zIndex:4000000,
+        opacity:0.7,
+    }
+    // container:{
+    //     flex:1,
+    //     justifyContent:'center',
+    //     alignItems:'center'
+    // }
+//   container: {
+//     position:'relative',
+//     height:50,
+//     backgroundColor:'transparent'
+// },
+// flex: 1,
+// alignItems: 'center',
+// justifyContent: 'center',
+//   translatedTextContainer: {
+//     position: 'absolute',
+//     bottom: 30,
+//     width: '100%',
+//     backgroundColor: '#0D69D7',
+//     padding: 10,
+//     alignItems: 'center',
+//     borderRadius:10,
+//   },
+//   translatedText: {
+//     color: 'white',
+//     fontSize: 16,
+//     textAlign: 'center',
+//   },
 });
