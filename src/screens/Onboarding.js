@@ -291,10 +291,12 @@ const styles = StyleSheet.create({
   phoneTextContainer: {
     backgroundColor: '#fff',
     paddingLeft: 0,
+    height:55
   },
   phoneCode: {
     fontWeight: '400',
     fontSize: 14,
+    height:55
   },
   phoneText: {
     fontWeight: '400',
@@ -303,6 +305,7 @@ const styles = StyleSheet.create({
     paddingVertical:5,
     borderLeftWidth: 1,
     borderColor: '#08090A',
+    height:55
   },
   label: {
     fontFamily: 'Lato-Bold',

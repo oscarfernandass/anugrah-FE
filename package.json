@@ -78,6 +78,7 @@
     "react-native-webrtc": "^124.0.4",
     "react-navigation": "^5.0.0",
     "rn-fetch-blob": "^0.12.0",
+    "whisper.rn": "^0.3.9",
     "yup": "^1.4.0",
     "zego-callkit-react-native": "1.0.6",
     "zego-express-engine-reactnative": "3.14.5",

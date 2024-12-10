@@ -21,9 +21,14 @@ import RNFS from 'react-native-fs';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
 import video from '../../assets/images/video.png';
+import muter from '../../assets/images/muter.png';
+import sounder from '../../assets/images/sounder.png';
 import RenderMessage from './RenderMessage';
 import back from '../../assets/images/back.jpg';
 import AudioCall from './AudioCall';
+import Call from './Call';
+import Tts from 'react-native-tts';
+
 const ContactChat = () => {
   const navigation=useNavigation();
   const route=useRoute();
@@ -33,6 +38,7 @@ const ContactChat = () => {
   const [imagesend,setImageSend] = useState('');
   const [senderPhoneNumber, setSenderPhoneNumber] = useState('');
   const [audioVisible,setAudioVisible]=useState(false);
+  const [audioSound,setAudioSound]=useState(false);
   const flex = route?.params?.number?.trim()?.replace(/^\+91/, ''); // Remove "+91" if present
   const userPhoneNumber = flex?.replace(/\s+/g, '').trim();
   useFocusEffect(
@@ -56,6 +62,7 @@ const ContactChat = () => {
       setUser();
     })
 
+    const callID = [senderPhoneNumber, userPhoneNumber].sort().join('_');
   useEffect(() => {
     if (!senderPhoneNumber || !userPhoneNumber) return;
   
@@ -64,13 +71,28 @@ const ContactChat = () => {
       collection(database, 'chats', chatPath, 'messages'),
       orderBy('timestamp', 'asc')
     );
+
   
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const fetchedMessages = snapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
       }));
+
+      // fetchedMessages.forEach(async (message) => {
+      //   if(message.sender!=senderPhoneNumber){
+      //     if (message.speakaudio) {
+      //       // Speak the message
+      //       Speak(message.text);
+      //           // Update the message's speakaudio to false
+      //       const messageRef = doc(database, 'chats', chatPath, 'messages', message.id);
+      //       await updateDoc(messageRef, { speakaudio: false });
+      //     }
+      //   }
+      // });
+
       setMessages(fetchedMessages);
+
     });
   
     return unsubscribe;
@@ -197,6 +219,7 @@ const startRecording = async () => {
         base64Image: imageToSend || null, // Store the base64 string
         sender: senderPhoneNumber,
         receiver: userPhoneNumber,
+        speakaudio:audioSound?true:false,
         timestamp: serverTimestamp(),
       };
   
@@ -209,10 +232,6 @@ const startRecording = async () => {
       }
     }
   };
-  
-
-
-  
 
 const playAudio = async (base64Audio) => {
   if (!base64Audio) {
@@ -254,6 +273,7 @@ const handleTextReceived =async (text) => {
       base64Image: null, // Store the base64 string
       sender: senderPhoneNumber,
       receiver: userPhoneNumber,
+      speakaudio:audioSound?true:false,
       timestamp: serverTimestamp(),
     };
 
@@ -273,7 +293,27 @@ const handleEndCall = () => {
   // Handle call end here (e.g., navigate back)
 };
 
+useEffect(()=>{
+  const set=async()=>{
+      await Tts.setDefaultVoice('en-in-x-ene-network');
+  }
+  set();
+})
+
+
+const Speak = async(text) => {
+  // await Tts.setDefaultVoice('ta-in-x-tac-network');
+  Tts.speak(text, {
+    androidParams: {
+      KEY_PARAM_PAN: -1,
+      KEY_PARAM_VOLUME: 1,
+      KEY_PARAM_STREAM: 'STREAM_MUSIC',
+    },
+  });
+};
+
   return (
+    <>
     <KeyboardAvoidingView style={[styles.container]} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
     <ImageBackground  source={back} style={styles.container}>
       <View style={styles.header}>
@@ -298,19 +338,27 @@ const handleEndCall = () => {
         )}
         {!audioVisible&&(
           <TouchableOpacity onPress={()=>{
-            navigation.navigate('Call',{number:userPhoneNumber})
+            navigation.navigate('Call',{number:userPhoneNumber,callID:callID})
           }} style={{marginRight:5}}>
         <Image tintColor={'white'} source={video} style={{width:25,height:25}}/>
+        </TouchableOpacity>
+            )}
+            {audioVisible&&(
+          <TouchableOpacity onPress={()=>{
+            setAudioSound(!audioSound);
+          }} style={{marginRight:5}}>
+        <Image tintColor={'white'} source={audioSound?sounder:muter} style={{width:audioSound?25:20,height:audioSound?25:20}}/>
         </TouchableOpacity>
             )}
       </View>
       {
         audioVisible && (
-      <View>
-        <AudioCall onTextReceived={handleTextReceived} onEndCall={handleEndCall} />
+          <View>
+        <AudioCall callID={callID} numberu={userPhoneNumber} onTextReceived={handleTextReceived} onEndCall={handleEndCall} />
       </View> 
         )
       }
+
       <FlatList
         ref={flatListRef}
         data={[...messages].reverse()}
@@ -383,12 +431,16 @@ const handleEndCall = () => {
 
     </ImageBackground>
     </KeyboardAvoidingView>
+</>
   );
 };
 
 export default ContactChat;
 
 const styles = StyleSheet.create({
+  font:{
+    fontFamily: 'Helvetica Neue',
+  },
   container: {
     flex: 1,
     backgroundColor: '#F8F8F8',

@@ -14,14 +14,14 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { translateText } from '../../api/api';
 
 const RenderMessage = ({ item, senderPhoneNumber, route, playAudio, voiceplay }) => {
-  useEffect(() => {
-    if (item.text) {
-      (async () => {
-        const translated = await getTranslatedText(item.text);
-        setTranslatedText(translated);
-      })();
-    }
-  }, [item.text]);
+  // useEffect(() => {
+  //   if (item.text) {
+  //     (async () => {
+  //       const translated = await getTranslatedText(item.text);
+  //       setTranslatedText(translated);
+  //     })();
+  //   }
+  // }, [item.text]);
   
   const [isModalVisible, setIsModalVisible] = useState(false);
   const isSender = item.sender === senderPhoneNumber;

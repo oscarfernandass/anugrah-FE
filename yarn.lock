@@ -10337,6 +10337,11 @@ which@^2.0.1, which@^2.0.2:
   dependencies:
     isexe "^2.0.0"
 
+whisper.rn@^0.3.9:
+  version "0.3.9"
+  resolved "https://registry.yarnpkg.com/whisper.rn/-/whisper.rn-0.3.9.tgz#fe59466021ddd53f83397054835011f71ed0c4fd"
+  integrity sha512-y2hsJ6IpUqtYUZA7YrtGqU3pTXNFzF8Piu8Ch4yAhBB6tyZcEl113e/X10xkd+bVfeIbrSZS2QJZQ4CBfbXS3g==
+
 wide-align@^1.1.5:
   version "1.1.5"
   resolved "https://registry.npmjs.org/wide-align/-/wide-align-1.1.5.tgz"

@@ -7,7 +7,7 @@ import RNFS from 'react-native-fs';
 import { audioToTextApi } from '../../api/api';
 import { useRef } from 'react';
 const Call = () => {
-  
+
   const route = useRoute();
   const navigation = useNavigation();
   const number = route?.params?.number;
@@ -94,7 +94,7 @@ const Call = () => {
         appSign={'0d8a3035128597c551008b5fb440f8e43b5b58c83c2b6f40062a1e38e5c8d3eb'}
         userID={number}
         userName={number}
-        callID={'uygfbbwdjcnjnissuduybe'}
+        callID={route?.params?.callID}
         config={{
           ...ONE_ON_ONE_VIDEO_CALL_CONFIG,
           onCallEnd: () => {
@@ -116,6 +116,18 @@ const Call = () => {
 export default Call;
 
 const styles = StyleSheet.create({
+//   container:{
+//     flex:1,
+//     justifyContent:'center',
+//     alignItems:'center',
+//     height:50,
+//     width:50,
+//     left:'45%',
+//     position:'absolute',
+//     top:50,
+//     zIndex:4000000,
+//     opacity:0.7,
+// }
   container: {
     flex: 1,
     alignItems: 'center',

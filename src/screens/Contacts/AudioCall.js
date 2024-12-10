@@ -4,9 +4,8 @@ import { ZegoUIKitPrebuiltCall, ONE_ON_ONE_VIDEO_CALL_CONFIG } from '@zegocloud/
 import AudioRecord from 'react-native-audio-record';
 import RNFS from 'react-native-fs';
 import { audioToTextApi } from '../../api/api';
-import { ZegoLayoutMode } from '@zegocloud/zego-uikit-rn';
-
-const AudioCall = ({ onTextReceived, onEndCall }) => {
+// import { ZegoLayoutMode } from '@zegocloud/zego-uikit-rn';
+const AudioCall = ({ onTextReceived, onEndCall, numberu, callID }) => {
   const recordingActive = useRef(true);
   const [pointerIndex, setPointerIndex] = useState(0);
   const [translatedText, setTranslatedText] = useState('');
@@ -26,6 +25,7 @@ const AudioCall = ({ onTextReceived, onEndCall }) => {
 
     return () => {
       recordingActive.current = false; // Stop recording
+      AudioRecord.stop(); // Stop any ongoing recording immediately
     };
   }, []);
 
@@ -59,64 +59,60 @@ const AudioCall = ({ onTextReceived, onEndCall }) => {
   const recordAudioSegment = async (duration) => {
     AudioRecord.start();
     await new Promise((resolve) => setTimeout(resolve, duration * 1000));
-    const filePath = await AudioRecord.stop();
-    return filePath;
-  };
-
-  const processAudioFile = async (filePath, pointerId) => {
-    try {
-      const fileData = await RNFS.readFile(filePath, 'base64');
-      const data = {
-        audio_base64: fileData,
-        src: 'english',
-        dest: 'tamil',
-      };
-      const response = await audioToTextApi(data);
-      if (response?.recognized_text?.length > 0) {
-        const tword = response.recognized_text[0].tword;
-        setTranslatedText(tword);
-        if (onTextReceived) {
-          onTextReceived(tword); // Pass the text to the parent
-        }
-      }
-    } catch (error) {
-      console.error(`Error processing file for pointer ${pointerId}:`, error);
+    if (!recordingActive.current) {
+        AudioRecord.stop();
+        return null;
     }
-  };
+    const filePath = await AudioRecord.stop();
+    if (!filePath || typeof filePath !== 'string') {
+        console.error('Invalid file path:', filePath);
+        return null;
+    }
+    return filePath;
+};
+
+const processAudioFile = async (filePath, pointerId) => {
+    if (!filePath) {
+        console.warn(`No file path for pointer ${pointerId}. Skipping processing.`);
+        return;
+    }
+    try {
+        const fileData = await RNFS.readFile(filePath, 'base64');
+        const data = { audio_base64: fileData, src: 'english', dest: 'tamil' };
+        const response = await audioToTextApi(data);
+        if (response) {
+            const tword1 = response.tword;
+                setTranslatedText(tword1);
+                onTextReceived?.(tword1);
+            } else {
+                console.warn(`No valid tword for pointer ${pointerId}.`);
+            }
+    } catch (error) {
+        console.error(`Error processing file for pointer ${pointerId}:`, error);
+    }
+};
+
+
 
   return (
     <View style={styles.container}>
       <ZegoUIKitPrebuiltCall
         appID={231756352}
         appSign={'0d8a3035128597c551008b5fb440f8e43b5b58c83c2b6f40062a1e38e5c8d3eb'}
-        userID={''}
-        userName={''}
-        callID={'uygfbbwdjcnjnissuduybe'}
+        userID={numberu}
+        userName={numberu}
+        callID={callID}
         config={{
           ...ONE_ON_ONE_VIDEO_CALL_CONFIG,
+          turnOnCameraWhenJoining: false,
           onCallEnd: () => {
             console.log('Call ended.');
+            recordingActive.current = false; // Stop background recording
+            AudioRecord.stop(); // Ensure ongoing recording stops immediately
             onEndCall();
-          },
-          turnOnCameraWhenJoining: false,
-          turnOnMicrophoneWhenJoining: true,
-          useSpeakerWhenJoining: true,
-          // onOnlySelfInRoom: () => ,
- 
-          layout: {
-            mode: ZegoLayoutMode.pictureInPicture,
-            config: {
-              smallViewBackgroundColor: 'transparent',
-              largeViewBackgroundColor: 'transparent',
-            },
           },
         }}
       />
-      {/* {translatedText ? (
-        <View style={styles.translatedTextContainer}>
-          <Text style={styles.translatedText}>{translatedText}</Text>
-        </View>
-      ) : null} */}
     </View>
   );
 };
