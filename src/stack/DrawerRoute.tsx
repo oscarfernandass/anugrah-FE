@@ -26,6 +26,7 @@ import Settings from "../screens/Profile/Settings.js";
 import Conferrence from "../screens/Conferrence/Conferrence.js";
 import VideosEntertain from "../screens/VideosEntertain.js";
 import ConferrenceMain from "../screens/Conferrence/ConferrencMain.js";
+import VoiceOut from "../screens/VoiceOut.js/VoiceOut.js";
 const Drawer = createDrawerNavigator();
 function customDrawerContent(props: DrawerContentComponentProps) {
     const[name,setName]=useState('');
@@ -52,9 +53,6 @@ function customDrawerContent(props: DrawerContentComponentProps) {
             <Animated.View className=" h-fit flex-1" >
                 <DrawerContentScrollView>
                     <DrawerItemList {...props} />
-                    {/* <DrawerItem label={() => (<Animated.Text className="text-[#1A2233] text-[14px] leading-[20px] font-helvetica-neue font-normal"> Account Settings</Animated.Text>)} icon={({ focused, color, size }) => (
-                        focused ? <SettingIcon width={20} height={20} fill={color} /> : <SettingOutlineIcon width={20} height={20} stroke={'#1A2233'} />
-                    )} onPress={() => { }} /> */}
                 </DrawerContentScrollView>
             </Animated.View>
         </Animated.View>
@@ -154,6 +152,16 @@ export default function DrawerRoute() {
                 options={{
                     drawerLabel: "Conferrence Mode",
                     title: "Conferrence Mode",
+                    drawerIcon: ({ focused, color, size }) => (
+                        focused ? <HeartIcon width={20} height={20} fill={color} /> : <HeartIcon width={20} height={20} stroke={color} />
+                    ),
+                    headerShown: false,
+                }}
+            />
+            <Drawer.Screen name="VoiceOut" component={VoiceOut}
+                options={{
+                    drawerLabel: "Voice out",
+                    title: "Voice out",
                     drawerIcon: ({ focused, color, size }) => (
                         focused ? <HeartIcon width={20} height={20} fill={color} /> : <HeartIcon width={20} height={20} stroke={color} />
                     ),

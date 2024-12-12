@@ -3543,6 +3543,11 @@
     react-native-safe-area-context "^4.4.1"
     react-native-sound "^0.11.2"
 
+"@zegocloud/zego-uikit-prebuilt-video-conference-rn@^1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@zegocloud/zego-uikit-prebuilt-video-conference-rn/-/zego-uikit-prebuilt-video-conference-rn-1.1.0.tgz#bf601e3d8ba6bd40c78fad61a5d151f60b6a52c5"
+  integrity sha512-JQnjW7i8fGfSlBwvTcI68V+LX7dm7I7lOKkCi1u5NOcOF+IOfcGfAFcm50xFhPsbwZK0UaSkC78q6nsN2SW5Aw==
+
 "@zegocloud/zego-uikit-rn@^2.14.7":
   version "2.14.7"
   resolved "https://registry.yarnpkg.com/@zegocloud/zego-uikit-rn/-/zego-uikit-rn-2.14.7.tgz#e44c740b6fc0e72e2912fc3d6f830ad5c3d216f4"

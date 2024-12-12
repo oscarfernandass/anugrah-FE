@@ -8,7 +8,7 @@ import { useNavigation } from '@react-navigation/native';
 import { useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { groupAudio } from '../../api/api';
-import { audioToTextApi } from '../../api/api';
+import { FlatList } from 'react-native';
 const Conferrence = () => {
   const navigation = useNavigation();
   const recordingActive = useRef(false);
@@ -16,6 +16,7 @@ const Conferrence = () => {
   const [pointerIndex, setPointerIndex] = useState(0);
   const [langer, setLanger] = useState('english');
   const animationRef = useRef(null);
+  const [recognizedData, setRecognizedData] = useState([]);
 
   useFocusEffect(
     useCallback(() => {
@@ -56,6 +57,7 @@ const Conferrence = () => {
       Alert.alert('Record audio permission denied');
     }
   };
+
 
   const initAudioRecord = () => {
     const options = {
@@ -136,13 +138,30 @@ const Conferrence = () => {
       const response = await groupAudio(data);
       // const response = await audioToTextApi(data);
       if (response) {
-        console.log(JSON.stringify(response, 2));
+        updateRecognizedData(response);
       } else {
         console.warn(`No valid response for pointer ${pointerId}.`);
       }
     } catch (error) {
       console.error(`Error processing file for pointer ${pointerId}:`, error);
     }
+  };
+
+
+  const updateRecognizedData = (response) => {
+    if (!response?.recognized_text) return;
+
+    const data = response.recognized_text.map((item) => {
+      const [id, content] = Object.entries(item)[0];
+      return {
+        id: id,
+        text: content.tword || 'No text recognized',
+        emoji: content.emoji,
+        emotion: content.emotion,
+      };
+    });
+
+    setRecognizedData(data);
   };
 
   const WelcomeMessage = () => {
@@ -155,6 +174,17 @@ const Conferrence = () => {
           <Text style={styles.blueText}>extract </Text> individual audio
         </Text>
       </View>
+    );
+  };
+
+
+  const renderItem = ({ item }) => {
+    return (
+      <TouchableOpacity style={{flexDirection:'column',padding:10,borderRadius:10,justifyContent:'center',alignItems:'center',backgroundColor:'#0D69D7',marginTop:4}}>
+        <Text style={{color:'white',fontSize:12}}>Speaker {item.id}</Text>
+        <Text style={{color:'white',fontSize:12}}>{item.text}</Text>
+        <Text style={{color:'white',fontSize:12}}>{item.emoji}</Text>
+      </TouchableOpacity>
     );
   };
 
@@ -193,6 +223,12 @@ const Conferrence = () => {
             <Text style={[styles.font, { color: 'white', paddingVertical: 10 }]}>recognize meeting</Text>
           </TouchableOpacity>
         </View>
+        <FlatList
+          data={recognizedData}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={styles.flatListContainer}
+        />
       </View>
     </>
   );
@@ -213,4 +249,5 @@ const styles = StyleSheet.create({
   font: {
     fontFamily: 'Helvetica Neue',
   },
+
 });

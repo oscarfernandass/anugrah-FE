@@ -140,6 +140,23 @@ export const postBlock = async (data) => {
   }
 }
 
+export const TextToVoice = async (data) => {
+  try {
+    const response = await axios.post(`${BASE_URL}emotion-audio`, data,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      }
+    );
+    if (response) return response.data;
+    else return false;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+}
+
 
 
 const customURL = 'https://surely-allowing-skylark.ngrok-free.app/'

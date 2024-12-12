@@ -106,7 +106,6 @@ const Linker = () => {
             setInputText('');
             setTimeout(() => addMessage({ text: 'Generate Description 😄', sender: 'assistant', type: 'description' }), 1500);
             setTimeout(() => addMessage({ text: 'Generate summary ✨', sender: 'assistant', type: 'summary' }), 2000);
-            setTimeout(() => addMessage({ text: 'Generate sign language 🌈', sender: 'assistant', type: 'signLanguage' }), 2500);
         }
     };
 
@@ -146,7 +145,7 @@ const Linker = () => {
     const handleTypeClick = async (type) => {
         setMessages((prevMessages) => {
             const filteredMessages = prevMessages.filter(
-                (msg) => !['summary', 'description', 'signLanguage', 'loading'].includes(msg.type)
+                (msg) => !['summary', 'description', 'loading'].includes(msg.type)
             );
             return [...filteredMessages];
         });

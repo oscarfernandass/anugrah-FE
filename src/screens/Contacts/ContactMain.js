@@ -12,6 +12,7 @@ import NewChat from './NewChat';
 import AudioCall from './AudioCall';
 import Language from '../Profile/Language';
 import Langer from './Langer';
+import GroupChat from './GroupChat';
 const ContactMain = () => {
   const navigation=useNavigation();
   const{logout}=useAuthContext();
@@ -71,6 +72,15 @@ const ContactMain = () => {
       <Stack.Screen
         name="Langer"
         component={Langer}
+        options={{
+          headerShown: false,
+          headerTitle: '',
+          headerTitleAlign: 'center',
+        }}
+      />
+      <Stack.Screen
+        name="GroupChat"
+        component={GroupChat}
         options={{
           headerShown: false,
           headerTitle: '',

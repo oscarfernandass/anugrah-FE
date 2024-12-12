@@ -8,27 +8,30 @@ import badge from '../../assets/images/badge.png';
 import sel from '../../assets/images/sel.png';
 import Carousel from './Carousel';
 import car1 from '../../assets/images/car1.jpg';
+import car2 from '../../assets/images/car2.jpg';
+import car3 from '../../assets/images/car3.jpg';
+import car4 from '../../assets/images/car4.jpg';
 import { useNavigation } from '@react-navigation/native';
 const HomeLearn = () => {
   const navigation=useNavigation();
   const carouselData = [
     {
       image: car1,
-      title: 'Winner Smart India Hackathon',
-      description: 'Ctrlshiftgeek emerged as winners of smart india hackathon 2023',
+      title: 'Winner 5G 6G Hackathon',
+      description: 'Cyklones emerged as winners of 5G 6G 2023',
     },
     {
-      image: car1,
+      image: car2,
       title: 'Fintech',
       description: 'Selected of Fintech, top 20 teams in india',
     },
     {
-      image: car1,
-      title: 'Scale 91',
-      description: 'Selected of scale 91, top 10 teams in india',
+      image: car3,
+      title: 'SIH 2023',
+      description: 'Selected for finals, among 600 teams in india',
     },
     {
-      image: car1,
+      image: car4,
       title: 'Pentathon',
       description: 'Participated in pentathon with award recognition',
     },
@@ -78,14 +81,14 @@ const HomeLearn = () => {
             <View style={{ backgroundColor: '#F8F9FA', height: 55, width: 60, borderRadius: 4, justifyContent: 'center', alignItems: 'center' }}>
               <Image source={security} style={{ height: 30, width: 30 }} />
             </View>
-            <Text style={[{ color: 'black', fontSize: 12, fontWeight: '400' }, styles.font]}>security</Text>
+            <Text style={[{ color: 'black', fontSize: 12, fontWeight: '400' }, styles.font]}>ChatBot</Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={{ flexDirection: 'column', gap: 3, justifyContent: 'center', alignItems: 'center' }}>
             <View style={{ backgroundColor: '#F8F9FA', height: 55, width: 60, borderRadius: 4, justifyContent: 'center', alignItems: 'center' }}>
               <Image source={sel} style={{ height: 30, width: 30 }} />
             </View>
-            <Text style={[{ color: 'black', fontSize: 12, fontWeight: '400' }, styles.font]}>security</Text>
+            <Text style={[{ color: 'black', fontSize: 12, fontWeight: '400' }, styles.font]}>Speech to Text</Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={{ flexDirection: 'column', gap: 3, justifyContent: 'center', alignItems: 'center' }}>
@@ -99,28 +102,28 @@ const HomeLearn = () => {
             <View style={{ backgroundColor: '#F8F9FA', height: 55, width: 60, borderRadius: 4, justifyContent: 'center', alignItems: 'center' }}>
               <Image source={sel} style={{ height: 30, width: 30 }} />
             </View>
-            <Text style={[{ color: 'black', fontSize: 12, fontWeight: '400' }, styles.font]}>security</Text>
+            <Text style={[{ color: 'black', fontSize: 12, fontWeight: '400' }, styles.font]}>Alert</Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={{ flexDirection: 'column', gap: 3, justifyContent: 'center', alignItems: 'center' }}>
             <View style={{ backgroundColor: '#F8F9FA', height: 55, width: 60, borderRadius: 4, justifyContent: 'center', alignItems: 'center' }}>
               <Image source={badge} style={{ height: 30, width: 30 }} />
             </View>
-            <Text style={[{ color: 'black', fontSize: 12, fontWeight: '400' }, styles.font]}>security</Text>
+            <Text style={[{ color: 'black', fontSize: 12, fontWeight: '400' }, styles.font]}>Voice</Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={{ flexDirection: 'column', gap: 3, justifyContent: 'center', alignItems: 'center' }}>
             <View style={{ backgroundColor: '#F8F9FA', height: 55, width: 60, borderRadius: 4, justifyContent: 'center', alignItems: 'center' }}>
               <Image source={thr} style={{ height: 30, width: 30 }} />
             </View>
-            <Text style={[{ color: 'black', fontSize: 12, fontWeight: '400' }, styles.font]}>security</Text>
+            <Text style={[{ color: 'black', fontSize: 12, fontWeight: '400' }, styles.font]}>Assistance</Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={{ flexDirection: 'column', gap: 3, justifyContent: 'center', alignItems: 'center' }}>
             <View style={{ backgroundColor: '#F8F9FA', height: 55, width: 60, borderRadius: 4, justifyContent: 'center', alignItems: 'center' }}>
               <Image source={security} style={{ height: 30, width: 30 }} />
             </View>
-            <Text style={[{ color: 'black', fontSize: 12, fontWeight: '400' }, styles.font]}>security</Text>
+            <Text style={[{ color: 'black', fontSize: 12, fontWeight: '400' }, styles.font]}>Blockchain</Text>
           </TouchableOpacity>
 
         </View>

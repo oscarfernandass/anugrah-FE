@@ -8,7 +8,7 @@ const generateID = () => {
   return '_' + Math.random().toString(36).substr(2, 9);
 };
 
-const GroupChat = () => {
+const GroupCha = () => {
   const [messages, setMessages] = useState([]);
   const [user, setUser] = useState(null);
 
@@ -98,7 +98,7 @@ const GroupChat = () => {
   );
 };
 
-export default GroupChat;
+export default GroupCha;
 const styles=StyleSheet.create({
   head:{
     color:'black',

@@ -27,6 +27,7 @@
     "@react-navigation/native-stack": "^6.9.26",
     "@react-navigation/stack": "^6.3.29",
     "@zegocloud/zego-uikit-prebuilt-call-rn": "^6.0.3",
+    "@zegocloud/zego-uikit-prebuilt-video-conference-rn": "^1.1.0",
     "@zegocloud/zego-uikit-rn": "^2.14.7",
     "axios": "^1.7.2",
     "buffer": "^6.0.3",

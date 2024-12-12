@@ -1,11 +1,13 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { StyleSheet, View, Alert, PermissionsAndroid, Text } from 'react-native';
-import { ZegoUIKitPrebuiltCall, GROUP_VOICE_CALL_CONFIG } from '@zegocloud/zego-uikit-prebuilt-call-rn';
+import { ZegoUIKitPrebuiltCall, GROUP_VIDEO_CALL_CONFIG } from '@zegocloud/zego-uikit-prebuilt-call-rn';
+import ZegoUIKitPrebuiltVideoConference from '@zegocloud/zego-uikit-prebuilt-video-conference-rn'
 import AudioRecord from 'react-native-audio-record';
 import RNFS from 'react-native-fs';
 import { audioToTextApi } from '../../api/api';
 // import { ZegoLayoutMode } from '@zegocloud/zego-uikit-rn';
-const VideoCall = ({ onTextReceived, onEndCall, numberu, callID,lang }) => {
+const GroupCall = ({user, onTextReceived, onEndCall, callID,lang }) => {
+  console.log(callID);
   const recordingActive = useRef(true);
   const [pointerIndex, setPointerIndex] = useState(0);
   const [translatedText, setTranslatedText] = useState('');
@@ -96,18 +98,18 @@ const processAudioFile = async (filePath, pointerId) => {
 };
 
 
-
+const group=user;
   return (
     <View style={styles.container}>
       <ZegoUIKitPrebuiltCall
         appID={231756352}
         appSign={'0d8a3035128597c551008b5fb440f8e43b5b58c83c2b6f40062a1e38e5c8d3eb'}
-        userID={numberu}
-        userName={numberu}
+        userID={group}
+        userName={group}
         callID={callID}
         config={{
-          ...GROUP_VOICE_CALL_CONFIG,
-          onCallEnd: () => {
+          ...GROUP_VIDEO_CALL_CONFIG,
+          onEndCall: () => {
             console.log('Call ended.');
             recordingActive.current = false; // Stop background recording
             AudioRecord.stop(); // Ensure ongoing recording stops immediately
@@ -119,14 +121,14 @@ const processAudioFile = async (filePath, pointerId) => {
   );
 };
 
-export default VideoCall;
+export default GroupCall;
 
 const styles = StyleSheet.create({
     container:{
         flex:1,
         justifyContent:'center',
         alignItems:'center',
-        height:260,
+        height:100,
         width:'100%',
         // left:'45%',
         position:'absolute',
