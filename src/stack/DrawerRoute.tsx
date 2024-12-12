@@ -17,12 +17,15 @@ import Profile from "../components/Profile.js";
 import Notifi from "../assets/icons/Notifi.svg";
 import Mail from "../assets/icons/Mail.svg";
 import { TouchableOpacity } from "react-native";
-import Analytics from "../screens/Analytics/Analytics.js";
+import Analytics from "../screens/Conferrence/Conferrence.js";
 import GroupChat from "../screens/GroupChat/GroupChat.js";
 import { useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Profiler from "../screens/Profile/Profiler.js";
 import Settings from "../screens/Profile/Settings.js";
+import Conferrence from "../screens/Conferrence/Conferrence.js";
+import VideosEntertain from "../screens/VideosEntertain.js";
+import ConferrenceMain from "../screens/Conferrence/ConferrencMain.js";
 const Drawer = createDrawerNavigator();
 function customDrawerContent(props: DrawerContentComponentProps) {
     const[name,setName]=useState('');
@@ -147,22 +150,34 @@ export default function DrawerRoute() {
                     headerShown: false,
                 }}
             />
-            <Drawer.Screen name="Analytics" component={Analytics}
+            <Drawer.Screen name="ConferrenceMain" component={ConferrenceMain}
                 options={{
-                    drawerLabel: "My Analytics",
-                    title: "My Analytics",
+                    drawerLabel: "Conferrence Mode",
+                    title: "Conferrence Mode",
                     drawerIcon: ({ focused, color, size }) => (
-                        focused ? <BookOpenIcon width={20} height={20} fill={color} /> : <BookOpenOutlineIcon width={20} height={20} stroke={color} />
+                        focused ? <HeartIcon width={20} height={20} fill={color} /> : <HeartIcon width={20} height={20} stroke={color} />
                     ),
                     headerShown: false,
                 }}
             />
+                <Drawer.Screen name="VideosEntertain" component={VideosEntertain}
+                    options={{
+                        drawerLabel: "Entertainment videos",
+                        title: "Entertainment",
+                        drawerIcon: ({ focused, color, size }) => (
+                            focused ? <BookOpenIcon width={20} height={20} fill={color} /> : <BookOpenOutlineIcon width={20} height={20} stroke={color} />
+
+                        ),
+                        headerShown: false,
+                    }}
+                />
                 <Drawer.Screen name="GroupChat" component={GroupChat}
                     options={{
                         drawerLabel: "Community Chat",
                         title: "docsChat Community",
                         drawerIcon: ({ focused, color, size }) => (
-                            focused ? <HeartIcon width={20} height={20} fill={color} /> : <HeartIcon width={20} height={20} stroke={color} />
+                            focused ? <BookOpenIcon width={20} height={20} fill={color} /> : <BookOpenOutlineIcon width={20} height={20} stroke={color} />
+
                         ),
                         headerShown: false,
                     }}

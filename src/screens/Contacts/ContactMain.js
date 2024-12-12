@@ -7,9 +7,11 @@ import { useNavigation } from '@react-navigation/native';
 import Contactss from './Contacts';
 import ContactChat from './ContactChat';
 import { CardStyleInterpolators } from '@react-navigation/stack';
-import Call from './Call';
+import VideoCall from './VideoCall';
 import NewChat from './NewChat';
 import AudioCall from './AudioCall';
+import Language from '../Profile/Language';
+import Langer from './Langer';
 const ContactMain = () => {
   const navigation=useNavigation();
   const{logout}=useAuthContext();
@@ -40,8 +42,8 @@ const ContactMain = () => {
         }}
       />
       <Stack.Screen
-        name="Call"
-        component={Call}
+        name="VideoCall"
+        component={VideoCall}
         options={{
           headerShown: false,
           headerTitle: '',
@@ -60,6 +62,15 @@ const ContactMain = () => {
       <Stack.Screen
         name="NewChat"
         component={NewChat}
+        options={{
+          headerShown: false,
+          headerTitle: '',
+          headerTitleAlign: 'center',
+        }}
+      />
+      <Stack.Screen
+        name="Langer"
+        component={Langer}
         options={{
           headerShown: false,
           headerTitle: '',

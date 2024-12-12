@@ -5,36 +5,21 @@ const Stack = createStackNavigator();
 const {useAuthContext} = require('../../hooks/Context');
 import { useNavigation } from '@react-navigation/native';
 import { CardStyleInterpolators } from '@react-navigation/stack';
-import Linker from './Linker';
-import PageList from './PageList';
-import { useRoute } from '@react-navigation/native';
-import VideoPlayer from './VideoPlayer';
-const LinkerMain = () => {
+import Conferrence from './Conferrence';
+import LangCon from './LangCon';
+const ConferrenceMain = () => {
   const navigation=useNavigation();
-  const{logout}=useAuthContext();
-  const route=useRoute();
   return (
     <Stack.Navigator
     screenOptions={{
         cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS, // for a horizontal slide
-        gestureEnabled: false,
-        gestureDirection: 'vertical', // direction of the slide
+        gestureEnabled: true,
+        gestureDirection: 'horizontal', // direction of the slide
       }}
     >
       <Stack.Screen
-        name="Linker"
-        component={Linker}
-        options={{
-          headerShown: false,
-          headerTitle: '',
-          headerTitleAlign: 'center',
-        }}
-        initialParams={{ routeLink: route?.params?.sharedUrl }}
-      />
-
-      <Stack.Screen
-        name="PageList"
-        component={PageList}
+        name="Conferrence"
+        component={Conferrence}
         options={{
           headerShown: false,
           headerTitle: '',
@@ -42,15 +27,14 @@ const LinkerMain = () => {
         }}
       />
       <Stack.Screen
-        name="VideoPlayer"
-        component={VideoPlayer}
+        name="LangCon"
+        component={LangCon}
         options={{
           headerShown: false,
           headerTitle: '',
           headerTitleAlign: 'center',
         }}
       />
-
     </Stack.Navigator>
   );
 };
@@ -75,4 +59,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default LinkerMain;
+export default ConferrenceMain;

@@ -1,17 +1,18 @@
 import React from 'react';
-import { View, Text, Button, StyleSheet, Image ,TouchableOpacity} from 'react-native';
+import { View, Text, Button, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
 import HomeLearn from './HomeLearn';
 import Notifi from '../../assets/icons/Notifi.svg';
 const Stack = createStackNavigator();
-const {useAuthContext} = require('../../hooks/Context');
+const { useAuthContext } = require('../../hooks/Context');
 import { useNavigation } from '@react-navigation/native';
 import PersonalizedButton from '../../components/PersonalizedButton';
 import Notification from '../Notification/Notification';
 import Profile from '../../components/Profile';
+import TextToSign from './TextToSign';
 const LearnMain = () => {
-  const navigation=useNavigation();
-  const{logout}=useAuthContext();
+  const navigation = useNavigation();
+  const { logout } = useAuthContext();
   return (
     <Stack.Navigator>
       <Stack.Screen
@@ -39,14 +40,14 @@ const LearnMain = () => {
             fontWeight: '600', // Make text bold
             color: '#0D69D7', // Set text color
             letterSpacing: 3, // Adjust spacing between letters
-      
-          },styles.font],
+
+          }, styles.font],
           headerTitleAlign: 'center',
         }}
-      />
-{/* <Stack.Screen
-        name="CourseLanding"
-        component={CourseLanding}
+      /> 
+      <Stack.Screen
+        name="TextToSign"
+        component={TextToSign}
         options={{
           headerRight: () => (
             <PersonalizedButton>
@@ -54,56 +55,25 @@ const LearnMain = () => {
                 onPress={() => {
                   navigation.navigate('Notification');
                 }}
-                >
+              >
                 <Notifi />
               </TouchableOpacity>
             </PersonalizedButton>
           ),
           headerShown: true,
-          headerTitle:() => null,
-          headerBackImage: () => (
-              <Back/>
-          ),
+          headerTitle: () => null,
+          // headerBackImage: () => (
+          //   <Back />
+          // ),
         }}
       />
-<Stack.Screen
-        name="PostCourse"
-        component={PostCourse}
-        options={{
-          headerRight: () => (
-            <TouchableOpacity style={{marginRight:15}}>
-            <Threedot  />
-          </TouchableOpacity>
-          ),
-          headerShown: false,
-          headerTitle:() => null,
-          headerBackImage: () => (
-              <Back/>
-          ),
-        }}
-      />
-<Stack.Screen
-        name="VideoPlay"
-        component={VideoPlay}
-        options={{
-          headerRight: () => (
-            <TouchableOpacity style={{marginRight:15}}>
-            <Threedot  />
-          </TouchableOpacity>
-          ),
-          headerShown: false,
-          headerTitle:() => null,
-          headerBackImage: () => (
-              <Back/>
-          ),
-        }}
-      /> */}
+
     </Stack.Navigator>
   );
 };
 
 const styles = StyleSheet.create({
-  font:{
+  font: {
     fontFamily: 'Helvetica Neue',
   },
   prof: {
@@ -118,10 +88,10 @@ const styles = StyleSheet.create({
     width: 45,
   },
   back: {
-    height: 20, 
-    width: 10, 
-    marginLeft: 5, 
-    marginRight:10,
+    height: 20,
+    width: 10,
+    marginLeft: 5,
+    marginRight: 10,
   },
 
 });

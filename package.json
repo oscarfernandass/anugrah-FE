@@ -76,6 +76,7 @@
     "react-native-video": "^6.4.3",
     "react-native-video-player": "^0.14.0",
     "react-native-webrtc": "^124.0.4",
+    "react-native-webview": "^13.12.5",
     "react-navigation": "^5.0.0",
     "rn-fetch-blob": "^0.12.0",
     "whisper.rn": "^0.3.9",

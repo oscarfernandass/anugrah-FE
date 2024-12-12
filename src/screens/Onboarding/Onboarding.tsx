@@ -93,6 +93,7 @@ const styles = StyleSheet.create({
     height: 50,
     marginBottom: 50,
     flexDirection: 'row',
+    justifyContent:'space-between'
   },
   fillCenter: {
     flex: 1,

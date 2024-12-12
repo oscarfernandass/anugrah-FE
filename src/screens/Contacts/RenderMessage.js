@@ -12,8 +12,31 @@ import {
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { translateText } from '../../api/api';
+import { doc, updateDoc } from 'firebase/firestore'; // Ensure you have this imported
+import Tts from 'react-native-tts';
+import { database, storage } from '../../../firebase';
 
-const RenderMessage = ({ item, senderPhoneNumber, route, playAudio, voiceplay }) => {
+const RenderMessage = ({ item, senderPhoneNumber, route, playAudio, voiceplay , chatPath}) => {
+
+  const [vise,setVise]=useState(false);
+  useEffect(() => {
+    const handleTTS = async () => {
+      if (item.sender !== senderPhoneNumber && item.speakaudio) {
+        // Speak the message
+        await Speak(item.text);
+
+        // Update Firestore to mark speakaudio as false
+        try {
+          const messageRef = doc(database, 'chats', chatPath, 'messages', item.id);
+          await updateDoc(messageRef, { speakaudio: false });
+        } catch (error) {
+          console.error('Error updating speakaudio status:', error);
+        }
+      }
+    };
+
+    handleTTS();
+  }, [item.speakaudio, item.sender, senderPhoneNumber, item.text, database, chatPath]);
   // useEffect(() => {
   //   if (item.text) {
   //     (async () => {
@@ -62,6 +85,21 @@ const RenderMessage = ({ item, senderPhoneNumber, route, playAudio, voiceplay })
   
 
   const handleCloseModal = () => setIsModalVisible(false);
+  const Speak = async (text) => {
+    try {
+      Tts.speak(text, {
+        androidParams: {
+          KEY_PARAM_PAN: -1,
+          KEY_PARAM_VOLUME: 1,
+          KEY_PARAM_STREAM: 'STREAM_MUSIC',
+        },
+      });
+    } catch (error) {
+      console.error('Error during TTS:', error);
+    }
+  };
+
+
 
   return (
     <>
@@ -129,6 +167,13 @@ const RenderMessage = ({ item, senderPhoneNumber, route, playAudio, voiceplay })
               {item.text}
             </Text>
           </TouchableWithoutFeedback>
+        )}
+        {item?.emoji&&(
+            <TouchableOpacity style={{backgroundColor:'black',justifyContent:'center',alignItems:'center',borderRadius:10}} onPress={()=>{
+              setVise(!vise);
+            }}>
+              <Text style={{color:'white',fontSize:12,padding:5}}>{vise?item.emotion:item.emoji}</Text>
+            </TouchableOpacity>
         )}
       </View>
       <Modal visible={isModalVisible} transparent={true} animationType="fade">

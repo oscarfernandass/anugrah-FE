@@ -5,11 +5,11 @@ import AudioRecord from 'react-native-audio-record';
 import RNFS from 'react-native-fs';
 import { audioToTextApi } from '../../api/api';
 // import { ZegoLayoutMode } from '@zegocloud/zego-uikit-rn';
-const AudioCall = ({ onTextReceived, onEndCall, numberu, callID ,lang}) => {
+const VideoCall = ({ onTextReceived, onEndCall, numberu, callID,lang }) => {
   const recordingActive = useRef(true);
   const [pointerIndex, setPointerIndex] = useState(0);
   const [translatedText, setTranslatedText] = useState('');
-  const[emoji,setEmoji]= useState('');
+
   useEffect(() => {
     const initializeCall = async () => {
       try {
@@ -79,10 +79,10 @@ const processAudioFile = async (filePath, pointerId) => {
     }
     try {
         const fileData = await RNFS.readFile(filePath, 'base64');
-        const data = { audio_base64: fileData, src: lang, dest: lang };
+        const data = { audio_base64: fileData, src: lang, dest: lang};
         const response = await audioToTextApi(data);
         if (response) {
-            const tword1 = response?.tword;
+            const tword1 = response.tword;
             const emoji= response?.emoji;
             const emotion= response?.emotion;
                 setTranslatedText(tword1);
@@ -91,9 +91,7 @@ const processAudioFile = async (filePath, pointerId) => {
                 console.warn(`No valid tword for pointer ${pointerId}.`);
             }
     } catch (error) {
-      
         console.error(`Error processing file for pointer ${pointerId}:`, error);
-
     }
 };
 
@@ -109,7 +107,6 @@ const processAudioFile = async (filePath, pointerId) => {
         callID={callID}
         config={{
           ...ONE_ON_ONE_VIDEO_CALL_CONFIG,
-          turnOnCameraWhenJoining: false,
           onCallEnd: () => {
             console.log('Call ended.');
             recordingActive.current = false; // Stop background recording
@@ -122,19 +119,47 @@ const processAudioFile = async (filePath, pointerId) => {
   );
 };
 
-export default AudioCall;
+export default VideoCall;
 
 const styles = StyleSheet.create({
     container:{
         flex:1,
         justifyContent:'center',
         alignItems:'center',
-        height:50,
-        width:50,
-        left:'45%',
+        height:260,
+        width:'100%',
+        // left:'45%',
         position:'absolute',
-        top:60,
+        // top:60,
         zIndex:4000000,
-        opacity:1,
+        // opacity:1,
     }
+    // container:{
+    //     flex:1,
+    //     justifyContent:'center',
+    //     alignItems:'center',
+    //     // height:100
+    // }
+//   container: {
+//     position:'relative',
+//     height:50,
+//     backgroundColor:'transparent'
+// },
+// flex: 1,
+// alignItems: 'center',
+// justifyContent: 'center',
+//   translatedTextContainer: {
+//     position: 'absolute',
+//     bottom: 30,
+//     width: '100%',
+//     backgroundColor: '#0D69D7',
+//     padding: 10,
+//     alignItems: 'center',
+//     borderRadius:10,
+//   },
+//   translatedText: {
+//     color: 'white',
+//     fontSize: 16,
+//     textAlign: 'center',
+//   },
 });
