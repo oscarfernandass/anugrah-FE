@@ -27,6 +27,7 @@ import Conferrence from "../screens/Conferrence/Conferrence.js";
 import VideosEntertain from "../screens/VideosEntertain.js";
 import ConferrenceMain from "../screens/Conferrence/ConferrencMain.js";
 import VoiceOut from "../screens/VoiceOut.js/VoiceOut.js";
+import SongVibration from "../screens/SongVibration/SongVibration.js";
 const Drawer = createDrawerNavigator();
 function customDrawerContent(props: DrawerContentComponentProps) {
     const[name,setName]=useState('');
@@ -190,6 +191,16 @@ export default function DrawerRoute() {
                         headerShown: false,
                     }}
                 />
+                {/* <Drawer.Screen name="SongVibration" component={SongVibration}
+                    options={{
+                        drawerLabel: "Song vibration",
+                        title: "songvibration",
+                        drawerIcon: ({ focused, color, size }) => (
+                            focused ? <SettingIcon width={20} height={20} fill={color} /> : <SettingOutlineIcon width={20} height={20} stroke={'#1A2233'} />
+                        ),
+                        headerShown: false,
+                    }}
+                /> */}
                 <Drawer.Screen name="Settings" component={Settings}
                     options={{
                         drawerLabel: "Account settings",

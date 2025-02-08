@@ -384,7 +384,7 @@ const GroupChat = () => {
 
             videoVisible && (
               <View>
-                <GroupCall user={senderPhoneNumber} lang={langer} callID={callID} onTextReceived={handleTextReceived} onEndCall={handleEndVideoCall} />
+                <GroupCall user={senderPhoneNumber} lang={langer} callID={callID} onTextReceived={handleTextReceived} onEndCalle={handleEndVideoCall} />
               </View>
             )
           }

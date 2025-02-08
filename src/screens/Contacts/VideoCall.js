@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { StyleSheet, View, Alert, PermissionsAndroid, Text } from 'react-native';
-import { ZegoUIKitPrebuiltCall, GROUP_VOICE_CALL_CONFIG } from '@zegocloud/zego-uikit-prebuilt-call-rn';
+import { ZegoUIKitPrebuiltCall, ONE_ON_ONE_VIDEO_CALL_CONFIG } from '@zegocloud/zego-uikit-prebuilt-call-rn';
 import AudioRecord from 'react-native-audio-record';
 import RNFS from 'react-native-fs';
 import { audioToTextApi } from '../../api/api';
@@ -106,7 +106,7 @@ const processAudioFile = async (filePath, pointerId) => {
         userName={numberu}
         callID={callID}
         config={{
-          ...GROUP_VOICE_CALL_CONFIG,
+          ...ONE_ON_ONE_VIDEO_CALL_CONFIG,
           onCallEnd: () => {
             console.log('Call ended.');
             recordingActive.current = false; // Stop background recording

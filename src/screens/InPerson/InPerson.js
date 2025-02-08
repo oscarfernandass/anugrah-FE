@@ -224,9 +224,17 @@ const InPerson = () => {
     const WelcomeMessage = () => {
         return (
             <View style={{ paddingTop: 0, paddingLeft: 5 }}>
-                <Text style={[{ fontSize: 18, color: 'black', fontWeight: '600', letterSpacing: 0.2 }, styles.font]}>
-                    I am <Text style={styles.blueText}>Patrick</Text>
+                    {
+                        gender?(
+                            <Text style={[{ fontSize: 18, color: 'black', fontWeight: '600', letterSpacing: 0.2 }, styles.font]}>
+                            I am <Text style={styles.blueText}>Patrick</Text>
                 </Text>
+                        ):(
+                            <Text style={[{ fontSize: 18, color: 'black', fontWeight: '600', letterSpacing: 0.2 }, styles.font]}>
+                            I am <Text style={styles.blueText}>Monica</Text>
+                </Text>
+                        )
+                    }
                 <Text style={[{ fontSize: 18, color: 'black', fontWeight: '600', letterSpacing: 0.2 }, styles.font]}>
                     <Text style={styles.blueText}>I speak</Text> on your behalf
                 </Text>
@@ -313,7 +321,9 @@ const InPerson = () => {
                         <WelcomeMessage />
                         <LottieView
                             ref={lottieRef}
-                            source={require('../../assets/lottie/patrick.json')}
+                            source={gender 
+                                ? require('../../assets/lottie/patrick.json') 
+                                : require('../../assets/lottie/monica.json')}
                             autoPlay={false} // Disable autoplay
                             loop={false} // Animation should not loop
                             style={{ height: 160, width: 160, marginTop: 0, marginLeft: -10 }}
